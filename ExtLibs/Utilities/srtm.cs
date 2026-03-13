@@ -100,6 +100,9 @@ namespace MissionPlanner.Utilities
 
             StartQueueProcess();
 
+            if (!Directory.Exists(datadirectory))
+                Directory.CreateDirectory(datadirectory);
+
             Directory.GetFiles(datadirectory).ToList().ForEach(x =>
             {
                 var fi = new FileInfo(x);
