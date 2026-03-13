@@ -1,6 +1,7 @@
 # GridFlight — archivos locales de desarrollo, no subir al repo
 CLAUDE.md
 MISSION_PLANNER_DOCS.md
+GridFlight/bitacora/
 
 *.pfx
 *.suo

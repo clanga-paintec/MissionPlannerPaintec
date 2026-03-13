@@ -1,0 +1,45 @@
+<Project>
+  <!--
+    GridFlight build customizations.
+    Este archivo es auto-importado por MSBuild — no requiere ningún cambio en MissionPlanner.csproj.
+    Aplica SOLO al proyecto MissionPlanner para no interferir con otros proyectos de la solución.
+  -->
+
+  <!-- Override del ícono embebido en el .exe (barra de título, taskbar, Alt+Tab) -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'MissionPlanner'">
+    <ApplicationIcon>GridFlight\assets\Gridflight-Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!-- Copia los assets de GridFlight al directorio de output para que los plugins los encuentren en runtime -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'MissionPlanner'">
+    <Content Include="GridFlight\assets\logo2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\Gridflight-Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\Gridflight-Icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\engine.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\ElevationGraphIcon.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\MaterialSymbolsRounded-VariableFont_FILL,GRAD,opsz,wght.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- Expone Gridflight-Icon.png como "icon.png" en la raíz del output.
+       Program.cs busca icon.png con File.Exists() y lo usa en el splash screen
+       si existe, sin necesidad de tocar su código fuente. -->
+  <Target Name="CopyGridFlightSplashIcon"
+          AfterTargets="Build"
+          Condition="'$(MSBuildProjectName)' == 'MissionPlanner'">
+    <Copy SourceFiles="GridFlight\assets\Gridflight-Icon.png"
+          DestinationFiles="$(OutputPath)icon.png" />
+  </Target>
+
+</Project>

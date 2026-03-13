@@ -1,10 +1,12 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using MissionPlanner;
 using MissionPlanner.Plugin;
+using MissionPlanner.Utilities;
 
 namespace GridFlight
 {
@@ -16,6 +18,8 @@ namespace GridFlight
     ///      de ArduPilot en la barra de menú y lo escala proporcionalmente a la
     ///      altura real del botón para evitar recortes.
     ///   2. Redirige el clic del logo a gridflight.tech en vez de ardupilot.org.
+    ///   3. Si Gridflight-Icon.png existe, lo aplica como ícono de la ventana
+    ///      (barra de título y barra de tareas).
     ///
     /// Por qué aquí y no en MainV2.cs:
     ///   MenuArduPilot es un campo public (MainV2.Designer.cs:265), por lo que
@@ -29,12 +33,18 @@ namespace GridFlight
         public override string Version => "1.0";
         public override string Author  => "GridFlight";
 
+        // Mantiene el ícono en memoria para toda la vida de la aplicación.
+        // Icon.FromHandle no toma ownership del HICON; sin esta referencia estática
+        // el GC podría colectar el objeto y dejar el handle colgado.
+        private static Icon _appIcon;
+
         public override bool Init() => true;
 
         public override bool Loaded()
         {
             ApplyLogo();
             RedirectLogoUrl();
+            ApplyWindowIcon();
             return false; // Sin loop periódico
         }
 
@@ -52,8 +62,34 @@ namespace GridFlight
             int targetHeight = btn.Height > 0 ? btn.Height : 31;
             int targetWidth  = (int)Math.Round(Program.Logo2.Width * (targetHeight / (double)Program.Logo2.Height));
 
-            btn.Image = new Bitmap(Program.Logo2, targetWidth, targetHeight);
-            btn.Width = targetWidth;
+            btn.Image  = new Bitmap(Program.Logo2, targetWidth, targetHeight);
+            btn.Width  = targetWidth;
+            // Margen izquierdo (18 px) separa el logo de los botones de navegación;
+            // margen derecho (24 px) da respiro visual antes de los controles de conexión.
+            btn.Margin = new Padding(18, 0, 24, 0);
+        }
+
+        /// <summary>
+        /// Carga Gridflight-Icon.ico y lo aplica como ícono de la ventana principal
+        /// (barra de título y barra de tareas de Windows).
+        ///
+        /// Se carga el .ico directamente con new Icon(path) en lugar del patrón
+        /// GetHicon() → FromHandle(). Ese patrón era frágil: el HICON quedaba inválido
+        /// al salir del bloque using porque GDI liberaba el bitmap subyacente antes
+        /// de que Windows consumiera el handle. Con new Icon(path) el runtime .NET
+        /// gestiona el ciclo de vida del ícono correctamente.
+        /// La referencia estática _appIcon evita que el GC descarte el objeto mientras
+        /// la aplicación está en ejecución.
+        /// </summary>
+        private void ApplyWindowIcon()
+        {
+            var path = Settings.GetRunningDirectory() +
+                       Path.Combine("GridFlight", "assets", "Gridflight-Icon.ico");
+
+            if (!File.Exists(path)) return;
+
+            _appIcon = new Icon(path);
+            Host.MainForm.Icon = _appIcon;
         }
 
         /// <summary>
