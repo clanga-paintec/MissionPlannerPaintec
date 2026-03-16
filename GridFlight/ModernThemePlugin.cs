@@ -34,39 +34,39 @@ namespace GridFlight
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(ModernThemePlugin));
 
-        public override string Name    => "GridFlight - Modern Theme";
-        public override string Version => "1.0";
-        public override string Author  => "GridFlight";
+        public override string Name => "GridFlight - Modern Amber Theme";
+        public override string Version => "1.1";
+        public override string Author => "GridFlight";
 
         #region Palette
 
         /// <summary>
-        /// Paleta de colores del tema moderno GridFlight.
-        /// Tema oscuro profesional con acento teal/cian.
+        /// Paleta de colores del tema moderno GridFlight (Edición Ámbar).
+        /// Tema oscuro profesional con acento dorado/ámbar.
         /// </summary>
         private static class Palette
         {
             // ── Fondos ─────────────────────────────────────────────────────
-            public static readonly Color Background      = Color.FromArgb(30, 33, 40);   // #1E2128
-            public static readonly Color Surface         = Color.FromArgb(40, 44, 52);   // #282C34
-            public static readonly Color SurfaceElevated = Color.FromArgb(45, 51, 59);   // #2D333B
-            public static readonly Color SurfaceInput    = Color.FromArgb(34, 38, 46);   // #22262E
+            public static readonly Color Background = Color.FromArgb(24, 24, 24);   // #181818
+            public static readonly Color Surface = Color.FromArgb(33, 33, 33);      // #212121
+            public static readonly Color SurfaceElevated = Color.FromArgb(45, 45, 45); // #2D2D2D
+            public static readonly Color SurfaceInput = Color.FromArgb(20, 20, 20);  // #141414
 
             // ── Acentos ────────────────────────────────────────────────────
-            public static readonly Color Primary         = Color.FromArgb(0, 150, 136);  // #009688 teal
-            public static readonly Color PrimaryDark     = Color.FromArgb(0, 121, 107);  // #00796B teal oscuro
-            public static readonly Color Accent          = Color.FromArgb(77, 208, 225); // #4DD0E1 cian claro
+            public static readonly Color Primary = Color.FromArgb(255, 193, 7);  // #FFC107 Amber
+            public static readonly Color PrimaryDark = Color.FromArgb(211, 158, 0); // #D39E00 Amber Oscuro
+            public static readonly Color Accent = Color.FromArgb(255, 213, 79); // #FFD54F Amber Claro
 
             // ── Texto ──────────────────────────────────────────────────────
-            public static readonly Color TextPrimary     = Color.FromArgb(224, 224, 224); // #E0E0E0
-            public static readonly Color TextSecondary   = Color.FromArgb(158, 158, 158); // #9E9E9E
-            public static readonly Color TextOnPrimary   = Color.FromArgb(255, 255, 255); // #FFFFFF
+            public static readonly Color TextPrimary = Color.FromArgb(245, 245, 245); // #F5F5F5
+            public static readonly Color TextSecondary = Color.FromArgb(170, 170, 170); // #AAAAAA
+            public static readonly Color TextOnPrimary = Color.FromArgb(33, 33, 33); // #212121 Texto oscuro sobre fondo amarillo (mejor accesibilidad)
 
             // ── Botones ────────────────────────────────────────────────────
-            public static readonly Color ButtonDisabled  = Color.FromArgb(64, 72, 84);   // #404854
+            public static readonly Color ButtonDisabled = Color.FromArgb(55, 55, 55);   // #373737
 
             // ── Bordes ─────────────────────────────────────────────────────
-            public static readonly Color Border          = Color.FromArgb(55, 62, 71);   // #373E47
+            public static readonly Color Border = Color.FromArgb(60, 60, 60);   // #3C3C3C
         }
 
         #endregion
@@ -83,57 +83,57 @@ namespace GridFlight
         public static class MaterialIcons
         {
             // ── Navegación ─────────────────────────────────────────────────
-            public static readonly string Home         = "\uE88A";
-            public static readonly string Menu         = "\uE5D2";
-            public static readonly string ArrowBack    = "\uE5C4";
+            public static readonly string Home = "\uE88A";
+            public static readonly string Menu = "\uE5D2";
+            public static readonly string ArrowBack = "\uE5C4";
             public static readonly string ArrowForward = "\uE5C8";
-            public static readonly string Close        = "\uE5CD";
-            public static readonly string ExpandMore   = "\uE5CF";
-            public static readonly string ExpandLess   = "\uE5CE";
+            public static readonly string Close = "\uE5CD";
+            public static readonly string ExpandMore = "\uE5CF";
+            public static readonly string ExpandLess = "\uE5CE";
             public static readonly string ChevronRight = "\uE5CC";
 
             // ── Vuelo / Dron ───────────────────────────────────────────────
             public static readonly string FlightTakeoff = "\uE914";
-            public static readonly string FlightLand    = "\uE904";
-            public static readonly string Flight        = "\uE539";
-            public static readonly string Map           = "\uE55B";
-            public static readonly string MyLocation    = "\uE55C";
-            public static readonly string GpsFixed      = "\uE1B3";
-            public static readonly string Explore       = "\uE87A";
-            public static readonly string Terrain       = "\uE564";
-            public static readonly string Speed         = "\uE9E4";
-            public static readonly string Height        = "\uEA16";
+            public static readonly string FlightLand = "\uE904";
+            public static readonly string Flight = "\uE539";
+            public static readonly string Map = "\uE55B";
+            public static readonly string MyLocation = "\uE55C";
+            public static readonly string GpsFixed = "\uE1B3";
+            public static readonly string Explore = "\uE87A";
+            public static readonly string Terrain = "\uE564";
+            public static readonly string Speed = "\uE9E4";
+            public static readonly string Height = "\uEA16";
 
             // ── Configuración y herramientas ───────────────────────────────
             public static readonly string Settings = "\uE8B8";
-            public static readonly string Build    = "\uF8A1";
-            public static readonly string Tune     = "\uE429";
-            public static readonly string Upload   = "\uE2C6";
+            public static readonly string Build = "\uF8A1";
+            public static readonly string Tune = "\uE429";
+            public static readonly string Upload = "\uE2C6";
             public static readonly string Download = "\uE2C4";
-            public static readonly string Sync     = "\uE627";
-            public static readonly string Refresh  = "\uE5D5";
-            public static readonly string Save     = "\uE161";
-            public static readonly string Delete   = "\uE872";
-            public static readonly string Edit     = "\uE3C9";
+            public static readonly string Sync = "\uE627";
+            public static readonly string Refresh = "\uE5D5";
+            public static readonly string Save = "\uE161";
+            public static readonly string Delete = "\uE872";
+            public static readonly string Edit = "\uE3C9";
 
             // ── Estado e información ───────────────────────────────────────
-            public static readonly string Info        = "\uE88E";
-            public static readonly string Warning     = "\uE002";
-            public static readonly string Error       = "\uE000";
+            public static readonly string Info = "\uE88E";
+            public static readonly string Warning = "\uE002";
+            public static readonly string Error = "\uE000";
             public static readonly string CheckCircle = "\uE86C";
-            public static readonly string Battery     = "\uE1A4";
-            public static readonly string Signal      = "\uE1D8";
-            public static readonly string Wifi        = "\uE63E";
+            public static readonly string Battery = "\uE1A4";
+            public static readonly string Signal = "\uE1D8";
+            public static readonly string Wifi = "\uE63E";
 
             // ── Misceláneos ────────────────────────────────────────────────
             public static readonly string Fullscreen = "\uE5D0";
-            public static readonly string ZoomIn     = "\uE8FF";
-            public static readonly string ZoomOut    = "\uE900";
-            public static readonly string Layers     = "\uE53B";
-            public static readonly string Timeline   = "\uE922";
-            public static readonly string Dashboard  = "\uE871";
-            public static readonly string Photo      = "\uE410";
-            public static readonly string Videocam   = "\uE04B";
+            public static readonly string ZoomIn = "\uE8FF";
+            public static readonly string ZoomOut = "\uE900";
+            public static readonly string Layers = "\uE53B";
+            public static readonly string Timeline = "\uE922";
+            public static readonly string Dashboard = "\uE871";
+            public static readonly string Photo = "\uE410";
+            public static readonly string Videocam = "\uE04B";
         }
 
         #endregion
@@ -159,14 +159,10 @@ namespace GridFlight
 
         #endregion
 
-        #region Plugin Lifecycle
+      #region Plugin Lifecycle
 
         public override bool Init() => true;
 
-        /// <summary>
-        /// Punto de entrada principal del tema. Se ejecuta en el hilo UI una vez
-        /// que MainV2 y todas las vistas principales están instanciadas.
-        /// </summary>
         public override bool Loaded()
         {
             try
@@ -174,29 +170,38 @@ namespace GridFlight
                 LoadIconFont();
                 InitializeModernFonts();
                 _toolStripRenderer = new ModernToolStripRenderer();
-
+                
+                // Desactivar AutoScale para evitar redimensionado no deseado
+                Host.MainForm.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None; 
                 OverrideThemeManagerColors();
 
                 // Fase 1: re-aplicar ThemeManager con los nuevos colores.
-                // Esto usa la lógica recursiva nativa de Mission Planner.
                 ThemeManager.ApplyThemeTo(Host.MainForm);
 
                 // Fase 2: recorrido recursivo propio para estilos extras
-                // que ThemeManager no cubre (FlatStyle, renderers, bordes).
                 ApplyModernExtras(Host.MainForm);
 
-                // Fase 3: tipografía moderna vía herencia de Font del Form.
+                // Fase 3: tipografía moderna segura
                 if (_modernFont != null)
-                    Host.MainForm.Font = _modernFont;
+                {
+                    Host.MainForm.SuspendLayout();
+                    
+                    // ELIMINADO: Host.MainForm.Font = _modernFont;
+                    // NUEVO: Aplicamos la fuente solo a los elementos que muestran texto, 
+                    // ignorando los contenedores (Forms, Panels, UserControls) que rompen el layout.
+                    ApplyFontToLeaves(Host.MainForm, _modernFont);
 
-                log.Info("ModernThemePlugin: Tema moderno aplicado correctamente.");
+                    Host.MainForm.ResumeLayout(false);
+                }
+
+                log.Info("ModernThemePlugin: Tema Ámbar aplicado (Edición GridFlight 1.1).");
             }
             catch (Exception ex)
             {
                 log.Error("ModernThemePlugin: Error al aplicar el tema moderno.", ex);
             }
 
-            return false; // Sin loop periódico
+            return false;
         }
 
         public override bool Exit()
@@ -206,6 +211,29 @@ namespace GridFlight
             _fontCollection?.Dispose();
 
             return true;
+        }
+
+        /// <summary>
+        /// Aplica la fuente SOLO a controles visuales finales, evitando cambiar 
+        /// la fuente de los contenedores para que WinForms no destruya el layout de SITL.
+        /// </summary>
+        private void ApplyFontToLeaves(Control root, Font font)
+        {
+            if (root == null || root.IsDisposed) return;
+
+            // Aplicar fuente solo si es un elemento visual de texto (evitamos Form, Panel, UserControl, TabControl)
+            if (root is Label || root is Button || root is CheckBox || 
+                root is RadioButton || root is ToolStrip || root is DataGridView || 
+                root is TextBox || root is ComboBox)
+            {
+                root.Font = font;
+            }
+
+            // Continuar la recursión por todos los hijos
+            foreach (Control child in root.Controls)
+            {
+                ApplyFontToLeaves(child, font);
+            }
         }
 
         #endregion
@@ -224,24 +252,24 @@ namespace GridFlight
         private void OverrideThemeManagerColors()
         {
             // Fondos
-            ThemeManager.BGColor        = Palette.Background;
+            ThemeManager.BGColor = Palette.Background;
             ThemeManager.ControlBGColor = Palette.Surface;
             ThemeManager.BGColorTextBox = Palette.SurfaceInput;
 
             // Texto
-            ThemeManager.TextColor                = Palette.TextPrimary;
-            ThemeManager.RTBForeColor             = Palette.TextPrimary;
-            ThemeManager.UnselectedTextColour     = Palette.TextSecondary;
+            ThemeManager.TextColor = Palette.TextPrimary;
+            ThemeManager.RTBForeColor = Palette.TextPrimary;
+            ThemeManager.UnselectedTextColour = Palette.TextSecondary;
 
             // Botones (MyButton usa gradiente top/bot)
-            ThemeManager.ButBG                    = Palette.Primary;
-            ThemeManager.ButBGBot                 = Palette.PrimaryDark;
-            ThemeManager.ButBorder                = Palette.Border;
-            ThemeManager.ButtonTextColor          = Palette.TextOnPrimary;
+            ThemeManager.ButBG = Palette.Primary;
+            ThemeManager.ButBGBot = Palette.PrimaryDark;
+            ThemeManager.ButBorder = Palette.Border;
+            ThemeManager.ButtonTextColor = Palette.TextOnPrimary;
             ThemeManager.ButtonTextColorNotEnabled = Palette.TextSecondary;
-            ThemeManager.ColorNotEnabled          = Palette.ButtonDisabled;
-            ThemeManager.ColorMouseOver           = Palette.Accent;
-            ThemeManager.ColorMouseDown           = Palette.PrimaryDark;
+            ThemeManager.ColorNotEnabled = Palette.ButtonDisabled;
+            ThemeManager.ColorMouseOver = Palette.Accent;
+            ThemeManager.ColorMouseDown = Palette.PrimaryDark;
 
             // Banners (ej. encabezados de sección en Config/Setup)
             ThemeManager.BannerColor1 = Palette.Background;
@@ -251,17 +279,17 @@ namespace GridFlight
             ThemeManager.BSVButtonAreaBGColor = Palette.Background;
 
             // Barras de progreso
-            ThemeManager.ProgressBarColorTop     = Palette.Primary;
-            ThemeManager.ProgressBarColorBot     = Palette.PrimaryDark;
+            ThemeManager.ProgressBarColorTop = Palette.Primary;
+            ThemeManager.ProgressBarColorBot = Palette.PrimaryDark;
             ThemeManager.ProgressBarOutlineColor = Palette.Border;
-            ThemeManager.HorizontalPBValueColor  = Palette.Primary;
+            ThemeManager.HorizontalPBValueColor = Palette.Primary;
 
             // Indicador PPM en pestaña Flight Modes
             ThemeManager.CurrentPPMBackground = Palette.Primary;
 
             // ZedGraph (gráficos de telemetría, logs, etc.)
-            ThemeManager.ZedGraphChartFill  = Palette.Surface;
-            ThemeManager.ZedGraphPaneFill   = Palette.Background;
+            ThemeManager.ZedGraphChartFill = Palette.Surface;
+            ThemeManager.ZedGraphPaneFill = Palette.Background;
             ThemeManager.ZedGraphLegendFill = Palette.SurfaceElevated;
         }
 
@@ -316,12 +344,12 @@ namespace GridFlight
 
             try
             {
-                _modernFont     = new Font(preferredFont, fontSize, FontStyle.Regular);
+                _modernFont = new Font(preferredFont, fontSize, FontStyle.Regular);
                 _modernFontBold = new Font(preferredFont, fontSize, FontStyle.Bold);
             }
             catch
             {
-                _modernFont     = new Font(FontFamily.GenericSansSerif, fontSize, FontStyle.Regular);
+                _modernFont = new Font(FontFamily.GenericSansSerif, fontSize, FontStyle.Regular);
                 _modernFontBold = new Font(FontFamily.GenericSansSerif, fontSize, FontStyle.Bold);
             }
         }
@@ -559,54 +587,54 @@ namespace GridFlight
         private class ModernColorTable : ProfessionalColorTable
         {
             // ── Fondo de ToolStrip ─────────────────────────────────────────
-            public override Color ToolStripGradientBegin      => Palette.Background;
-            public override Color ToolStripGradientMiddle     => Palette.Background;
-            public override Color ToolStripGradientEnd        => Palette.Background;
-            public override Color ToolStripBorder             => Palette.Border;
+            public override Color ToolStripGradientBegin => Palette.Background;
+            public override Color ToolStripGradientMiddle => Palette.Background;
+            public override Color ToolStripGradientEnd => Palette.Background;
+            public override Color ToolStripBorder => Palette.Border;
             public override Color ToolStripDropDownBackground => Palette.Surface;
 
             // ── Fondo de MenuStrip ─────────────────────────────────────────
             public override Color MenuStripGradientBegin => Palette.Background;
-            public override Color MenuStripGradientEnd   => Palette.Background;
-            public override Color MenuBorder             => Palette.Border;
+            public override Color MenuStripGradientEnd => Palette.Background;
+            public override Color MenuBorder => Palette.Border;
 
             // ── Ítems de menú ──────────────────────────────────────────────
-            public override Color MenuItemSelected                => Palette.SurfaceElevated;
-            public override Color MenuItemBorder                  => Palette.Border;
-            public override Color MenuItemSelectedGradientBegin   => Palette.SurfaceElevated;
-            public override Color MenuItemSelectedGradientEnd     => Palette.SurfaceElevated;
-            public override Color MenuItemPressedGradientBegin    => Palette.PrimaryDark;
-            public override Color MenuItemPressedGradientEnd      => Palette.PrimaryDark;
+            public override Color MenuItemSelected => Palette.SurfaceElevated;
+            public override Color MenuItemBorder => Palette.Border;
+            public override Color MenuItemSelectedGradientBegin => Palette.SurfaceElevated;
+            public override Color MenuItemSelectedGradientEnd => Palette.SurfaceElevated;
+            public override Color MenuItemPressedGradientBegin => Palette.PrimaryDark;
+            public override Color MenuItemPressedGradientEnd => Palette.PrimaryDark;
 
             // ── Margen de imágenes ─────────────────────────────────────────
-            public override Color ImageMarginGradientBegin  => Palette.Background;
+            public override Color ImageMarginGradientBegin => Palette.Background;
             public override Color ImageMarginGradientMiddle => Palette.Background;
-            public override Color ImageMarginGradientEnd    => Palette.Background;
+            public override Color ImageMarginGradientEnd => Palette.Background;
 
             // ── Separadores ────────────────────────────────────────────────
-            public override Color SeparatorDark  => Palette.Border;
+            public override Color SeparatorDark => Palette.Border;
             public override Color SeparatorLight => Palette.Surface;
 
             // ── Botones de ToolStrip ───────────────────────────────────────
-            public override Color ButtonSelectedBorder          => Palette.Primary;
-            public override Color ButtonSelectedHighlight       => Palette.SurfaceElevated;
-            public override Color ButtonSelectedGradientBegin   => Palette.SurfaceElevated;
-            public override Color ButtonSelectedGradientEnd     => Palette.SurfaceElevated;
-            public override Color ButtonPressedHighlight        => Palette.PrimaryDark;
-            public override Color ButtonPressedGradientBegin    => Palette.PrimaryDark;
-            public override Color ButtonPressedGradientEnd      => Palette.PrimaryDark;
-            public override Color ButtonCheckedGradientBegin    => Palette.Primary;
-            public override Color ButtonCheckedGradientEnd      => Palette.Primary;
-            public override Color ButtonCheckedHighlight        => Palette.Primary;
+            public override Color ButtonSelectedBorder => Palette.Primary;
+            public override Color ButtonSelectedHighlight => Palette.SurfaceElevated;
+            public override Color ButtonSelectedGradientBegin => Palette.SurfaceElevated;
+            public override Color ButtonSelectedGradientEnd => Palette.SurfaceElevated;
+            public override Color ButtonPressedHighlight => Palette.PrimaryDark;
+            public override Color ButtonPressedGradientBegin => Palette.PrimaryDark;
+            public override Color ButtonPressedGradientEnd => Palette.PrimaryDark;
+            public override Color ButtonCheckedGradientBegin => Palette.Primary;
+            public override Color ButtonCheckedGradientEnd => Palette.Primary;
+            public override Color ButtonCheckedHighlight => Palette.Primary;
 
             // ── Overflow ───────────────────────────────────────────────────
-            public override Color OverflowButtonGradientBegin  => Palette.Background;
+            public override Color OverflowButtonGradientBegin => Palette.Background;
             public override Color OverflowButtonGradientMiddle => Palette.Background;
-            public override Color OverflowButtonGradientEnd    => Palette.Background;
+            public override Color OverflowButtonGradientEnd => Palette.Background;
 
             // ── StatusStrip ────────────────────────────────────────────────
             public override Color StatusStripGradientBegin => Palette.Background;
-            public override Color StatusStripGradientEnd   => Palette.Background;
+            public override Color StatusStripGradientEnd => Palette.Background;
         }
 
         #endregion
