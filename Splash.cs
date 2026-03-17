@@ -6,6 +6,8 @@ namespace MissionPlanner
 {
     public partial class Splash : Form
     {
+        internal static Splash instance;
+
         public Splash()
         {
             InitializeComponent();

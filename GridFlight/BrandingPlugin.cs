@@ -42,6 +42,7 @@ namespace GridFlight
 
         public override bool Loaded()
         {
+            
             ApplyLogo();
             RedirectLogoUrl();
             ApplyWindowIcon();
@@ -57,6 +58,7 @@ namespace GridFlight
         private void ApplyLogo()
         {
             if (Program.Logo2 == null) return;
+
 
             var btn         = Host.MainForm.MenuArduPilot;
             int targetHeight = btn.Height > 0 ? btn.Height : 31;

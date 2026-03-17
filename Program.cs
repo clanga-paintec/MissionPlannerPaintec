@@ -217,8 +217,8 @@ namespace MissionPlanner
             {
             }
 
-            if (File.Exists(Settings.GetRunningDirectory() + "logo.png"))
-                Logo = new Bitmap(Settings.GetRunningDirectory() + "logo.png");
+            if (File.Exists(Settings.GetRunningDirectory() + Path.Combine("GridFlight", "assets", "missionplannergrid.png")))
+                Logo = new Bitmap(Settings.GetRunningDirectory()  + Path.Combine("GridFlight", "assets", "missionplannergrid.png"));
 
             if (File.Exists(Settings.GetRunningDirectory() + Path.Combine("GridFlight", "assets", "logo2.png")))
                 Logo2 = new Bitmap(Settings.GetRunningDirectory() + Path.Combine("GridFlight", "assets", "logo2.png"));
