@@ -29,7 +29,7 @@ namespace GridFlight
         public override string Version => "1.0";
         public override string Author  => "GridFlight";
 
-        public override bool Init() => true;
+        public override bool Init() => GridFlightProfile.IsPilot;
 
         public override bool Loaded()
         {

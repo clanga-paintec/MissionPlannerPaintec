@@ -1,210 +1,122 @@
-# MissionPlanner by GridFlight
+# GridFlight Mission Planner
 
-![GridFlight Logo](logo2.png)
+![GridFlight](https://img.shields.io/badge/GridFlight-Mission%20Planner-FFC107?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIxIDl2MTBoLTZ2LTRoLTZ2NEgzVjlsOS03eiIgZmlsbD0iI0ZGQzEwNyIvPjwvc3ZnPg==)
+![License](https://img.shields.io/badge/license-GPLv3-blue?style=for-the-badge)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey?style=for-the-badge)
 
-![GridFlight MissionPlanner](https://img.shields.io/badge/GridFlight-MissionPlanner-orange)
-
-## MissionPlannerPaintec - Solución Mejorada
-
-**MissionPlannerPaintec** es una versión mejorada y personalizada de Mission Planner, desarrollada por **GridFlight** para proporcionar una experiencia más intuitiva y adaptada a las necesidades específicas de nuestros clientes.
-
-Esta solución ha sido optimizada para simplificar los flujos de trabajo de planificación de misiones, ofreciendo una interfaz de usuario mejorada y funcionalidades adaptadas a los requisitos del sector de drones comerciales.
+Version personalizada de [ArduPilot Mission Planner](https://github.com/ArduPilot/MissionPlanner) desarrollada por **GridFlight** para operadores de drones comerciales.
 
 ---
 
-## Características Principales
+## Que es GridFlight
 
-- **Interfaz Intuitiva**: Diseño simplificado para una experiencia de usuario más fluida
-- **Optimizado para Clientes**: Funcionalidades adaptadas a las necesidades del sector comercial de drones
-- **Mejoras de Rendimiento**: Optimizaciones internas para mayor estabilidad y velocidad
-- **Soporte Localizado**: Compatible con múltiples idiomas para usuarios internacionales
+GridFlight transforma Mission Planner en una herramienta mas segura e intuitiva para pilotos y mecanicos, sin modificar el codigo fuente original. Todo funciona mediante un **sistema de 12 plugins** que se activan segun el perfil del usuario.
 
-## Acerca de GridFlight
+### Perfiles
 
-**GridFlight** es una empresa especializada en soluciones tecnológicas para la industria de drones. Nuestros servicios incluyen:
-
-- Desarrollo de software personalizado para sistemas UAV
-- Integración de misiones autónomas
-- Consultoría técnica y soporte especializado
-- Formación y certificación de operadores
+| Perfil | Descripcion |
+|--------|-------------|
+| **Piloto** | Interfaz simplificada con tema ambar, menus reducidos, atajos operativos y modos de vuelo filtrados |
+| **Mecanico** | MissionPlanner original con branding GridFlight y acceso completo a todas las funciones |
 
 ---
 
-## Información Técnica
+## Funcionalidades
 
-### Requisitos del Sistema
+### Identidad Visual
+- Tema moderno con paleta ambar oscura (`ModernThemePlugin`)
+- Iconos de toolbar personalizados (`IconOverridePlugin`)
+- Logo, icono de ventana y splash screen GridFlight (`BrandingPlugin`)
+
+### Seguridad de Vuelo
+- Filtro de modos de vuelo peligrosos — configurable (`FlightModePlugin`)
+- Lista completa de modos solo para mecanicos
+
+### Simplificacion de Interfaz
+- Ocultacion de menus de hardware irrelevante (`HideOptionalHardwarePlugin`)
+- Ocultacion de configuracion avanzada (`HideSetupMenuItemsPlugin`)
+
+### Atajos Operativos
+- Write & Verify en un click (`WriteVerifyPlugin`)
+- Motor Test rapido desde toolbar — solo en SITL (`MotorTestShortcut`)
+- Perfil de elevacion rapido (`ElevationGraphShortcut`)
+
+### Gestion de Configuraciones
+- Guardar, cargar, importar y eliminar archivos `.param` (`FavoriteConfigsPlugin`)
+- Selector de perfil Piloto/Mecanico con persistencia (`ProfileSelectorPlugin`)
+
+---
+
+## Arquitectura
+
+```
+GridFlight/
+├── assets/                    Iconos, logos, fuentes, frames
+├── configs/                   Configuraciones .param guardadas (runtime)
+├── Docs/                      Documentacion tecnica
+│   ├── ARCHITECTURE.md        Arquitectura del sistema
+│   └── *.md                   Doc individual por plugin
+├── GridFlightProfile.cs       Utilidad de gestion de perfil
+├── BrandingPlugin.cs          Identidad visual
+├── IconOverridePlugin.cs      Iconos toolbar
+├── ModernThemePlugin.cs       Tema ambar
+├── FlightModePlugin.cs        Control de modos de vuelo
+├── HideOptionalHardwarePlugin.cs
+├── HideSetupMenuItemsPlugin.cs
+├── WriteVerifyPlugin.cs       Write & Verify
+├── MotorTestShortcut.cs       Atajo Motor Test
+├── ElevationGraphShortcut.cs  Atajo perfil elevacion
+├── FavoriteConfigsPlugin.cs   Gestor de configs
+└── ProfileSelectorPlugin.cs   Selector de perfil
+```
+
+> Documentacion tecnica completa en [`GridFlight/Docs/ARCHITECTURE.md`](GridFlight/Docs/ARCHITECTURE.md)
+
+---
+
+## Compilacion
+
+### Requisitos
 
 - Windows 10/11 (64-bit)
-- Visual Studio 2022
-- .NET Framework 4.8 o superior
+- Visual Studio 2022 ([descargar](https://visualstudio.microsoft.com/downloads/))
+- .NET Framework 4.8+
 
-### Compilación
+### Pasos
 
 ```bash
 # Clonar el repositorio
 git clone https://github.com/clanga-paintec/MissionPlannerPaintec.git
 
-# Inicializar submódulos
+# Inicializar submodulos
 git submodule update --init
 
-# Compilar con Visual Studio
-# Abrir MissionPlanner.sln y compilar
+# Abrir MissionPlanner.sln en Visual Studio y compilar
 ```
 
+> Los plugins se compilan automaticamente con el proyecto principal. No requieren configuracion adicional.
+
 ---
+
+## Roadmap
+
+### v1.2 — En desarrollo
+
+- [ ] **Perfil Mecanico completo** — Implementacion completa de funcionalidades exclusivas para mecanicos (diagnostico, parametros avanzados, herramientas de mantenimiento)
+
+### Futuro
+
+- [ ] Sistema de actualizaciones OTA para plugins
+- [ ] Dashboard de estado de flota
+- [ ] Integracion con herramientas de registro de vuelo
+
+---
+
+## Creditos
+
+- Basado en [ArduPilot Mission Planner](https://github.com/ArduPilot/MissionPlanner) por Michael Oborne
+- Desarrollado por el equipo de **GridFlight**
 
 ## Licencia
 
-Este proyecto está basado en el código abierto de [ArduPilot Mission Planner](https://github.com/ArduPilot/MissionPlanner). Consulte el archivo [COPYING.txt](COPYING.txt) para más información sobre la licencia original.
-
----
-
-## Contacto
-
-Para consultas técnicas o comerciales:
-- **GridFlight** - Soluciones UAV Avanzadas
-- Website: *Próximamente disponible*
-- Email: *Contacto a través de GitHub*
-
----
-
-## Enlace Original
-
-Proyecto original: [ArduPilot Mission Planner](https://github.com/ArduPilot/MissionPlanner)
-
-Website original: http://ardupilot.org/planner/
-
----
-
-## How to compile
-
-### On Windows (Recommended)
-
-#### 1. Install software
-
-##### Main requirements
-
-Currently, Mission Planner needs:
-
-Visual Studio 2022
-
-##### IDE
-
-### Visual Studio Community
-To compile Mission Planner, we recommend using Visual Studio. You can download Visual Studio Community from the [Visual Studio Download page](https://visualstudio.microsoft.com/downloads/ "Visual Studio Download page").
-
-Visual Studio is a comprehensive suite with built-in Git support, but it can be overwhelming due to its complexity. To streamline the installation process, you can customize your installation by selecting the relevant "Workloads" and "Individual components" based on your software development needs.
-
-To simplify this selection process, we have provided a configuration file that specifies the components required for MissionPlanner development. Here's how you can use it:
-
-1. Go to "More" in the Visual Studio installer.
-2. Select "Import configuration."
-3. Use the following file: [vs2022.vsconfig](https://raw.githubusercontent.com/ArduPilot/MissionPlanner/master/vs2022.vsconfig "vs2022.vsconfig").
-
-By following these steps, you'll have the necessary components installed and ready for Mission Planner development.
-
-###### VSCode
-Currently VSCode with C# plugin is able to parse the code but cannot build.
-
-#### 2. Get the code
-
-If you get Visual Studio Community, you should be able to use Git from the IDE. 
-Clone `https://github.com/ArduPilot/MissionPlanner.git` to get the full code.
-
-In case you didn't install an IDE, you will need to manually install Git. Please follow instruction in https://ardupilot.org/dev/docs/where-to-get-the-code.html#downloading-the-code-using-git
-
-Open a git bash terminal in the MissionPlanner directory and type, "git submodule update --init" to download all submodules
-
-#### 3. Build
-
-To build the code:
-- Open MissionPlanner.sln with Visual Studio
-- From the Build menu, select "Build MissionPlanner"
-
-### On other systems
-Building Mission Planner on other systems isn't support currently.
-
-## Launching Mission Planner on other system
-
-Mission Planner is available for Android via the Play Store. https://play.google.com/store/apps/details?id=com.michaeloborne.MissionPlanner
-Mission Planner can be used with Mono on Linux systems. Be aware that not all functions are available on Linux.
-Native MacOS and iOS support is experimental and not recommended for inexperienced users. https://github.com/ArduPilot/MissionPlanner/releases/tag/osxlatest 
-For MacOS users it is recommended to use Mission Planner for Windows via Boot Camp or Parallels (or equivalent).
-
-### On Linux
-
-#### Requirements
-
-Those instructions were tested on Ubuntu 20.04.
-Please install Mono, either :
-- `sudo apt install mono-complete mono-runtime libmono-system-windows-forms4.0-cil libmono-system-core4.0-cil libmono-winforms4.0-cil libmono-corlib4.0-cil libmono-system-management4.0-cil libmono-system-xml-linq4.0-cil`
-
-#### Launching
-
-- Get the lastest zipped version of Mission Planner here : https://firmware.ardupilot.org/Tools/MissionPlanner/MissionPlanner-latest.zip
-- Unzip in the directory you want
-- Go into the directory
-- run with `mono MissionPlanner.exe`
-
-You can debug Mission Planner on Mono with `MONO_LOG_LEVEL=debug mono MissionPlanner.exe`
-
-### External Services Used
-
-| Source | Use | How to disable | Custodian |
-|---|---|---|---|
-| https://firmware.oborne.me  | used as a global cdn for checking for MP update check - checked once per day at startup | edit missionplanner.exe.config | Michael Oborne |
-| https://firmware.ardupilot.org  | used for updates to stable, firmware metadata, firmware, user alerts, gstreamer, SRTM, SITL | updates to stable (edit missionplanner.exe.config) - all others Not possible | Ardupilot Team |
-| https://github.com/ | used for updates to beta | edit missionplanner.exe.config | Michael Oborne |
-| https://raw.githubusercontent.com | old param metadata, sitl config files | Not possible | Ardupilot Team |
-| https://api.github.com/ | ardupilot preload param files | Not possible | Ardupilot Team |
-| https://raw.oborne.me/  | used as glocal cdn for parameter metadata generator, no longer primary source | only used at user request to regenerate, edit missionplanner.exe.config | Michael Oborne |
-| https://maps.google.com  | used for elevation api - removed due to abuse | N/A | N/A |
-| https://discuss.cubepilot.org/ | use for SB2 reporting - only on affected boards when user enters details | only used at user request | CubePilot |
-| https://altitudeangel.com  | utm data - user enabled | only used at user request | Altitude Angel |
-| https://autotest.ardupilot.org  | dataflash log meta data, parameter metadata | Not Possible | Ardupilot Team |
-| Many | your choice of map provider google/bing/openstreetmap/etc | User selectable | User/Many |
-| https://www.cloudflare.com | geo location provider - for NFZ selection | Not Possible | Michael Oborne |
-| https://esua.cad.gov.hk | HK no fly zones - user enabled | User selectable | HK Gov |
-| https://ssl.google-analytics.com | Google Analytics Anonymous Stats - Screen Loads, Exceptions/Crashs, Events (Connect), Startup Timing, FW upload (FW Type and Board Type) | disable in Config > Planner > OptOut Anon Stats | Michael Oborne |
-| https://api.dronelogbook.com | logging - disabled | N/A | N/A |
-| https://ardupilot.org | help urls on many pages | User Initiated | ArduPilot Team |
-| https://www.youtube.com | help videos on many pages | User Initiated | ArduPilot Team |
-| https://files.rfdesign.com.au | RFD firmwares | User Initiated | RFDesign |
-| https://teck.airmarket.io | airmarket - disabled | N/A | N/A |
-
-### Offline Use - No Internet
-
-| Location | Use | Transferable between pcs |
-|---|---|---|
-| C:\ProgramData\Mission Planner\gmapcache | Map cache | yes |
-| C:\ProgramData\Mission Planner\srtm | Elevation data cache | yes |
-| C:\ProgramData\Mission Planner\*.pdef.xml | Parameter cache | yes |
-| C:\ProgramData\Mission Planner\LogMessages*.xml | DF Log metadata cache | yes |
-
-on linux this is in /home/<user>/.local/share/Mission Planner/
-
-### Offline Data Supported
-#### Elevation
-* SRTM Cache
-* GeoTiff's in WGS84/EGM96
-* DTED
-
-#### Images
-* Map Cache
-* WMS
-* WMTS
-* GDAL
-
-### Paths used - Default
-
-| Location | Use |
-|---|---|
-| C:\ProgramData\Mission Planner | All cross user content |
-| C:\Users\USERNAME\Documents\Mission Planner | All per user content |
-
-on linux this is in /home/<user>/.local/share/Mission Planner/
-
-### CA Cert
-A CA cert is installed to the root store and used to sign the windows serial port drivers, and is installed as part of the MSI install.
-
-[![FlagCounter](https://s01.flagcounter.com/count2/A4bA/bg_FFFFFF/txt_000000/border_CCCCCC/columns_8/maxflags_40/viewers_0/labels_1/pageviews_0/flags_0/percent_0/)](https://info.flagcounter.com/A4bA)
+Este proyecto esta basado en el codigo abierto de ArduPilot Mission Planner. Consulte [COPYING.txt](COPYING.txt) para informacion sobre la licencia GPLv3.

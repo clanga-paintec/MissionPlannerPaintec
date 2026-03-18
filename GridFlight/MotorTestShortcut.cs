@@ -36,7 +36,7 @@ namespace GridFlight
         // sin desperdiciar CPU. Se usa para actualizar la visibilidad del botón.
         private const float _checkRateHz = 2f;
 
-        public override bool Init()   => true;
+        public override bool Init()   => GridFlightProfile.IsPilot;
         public override bool Exit()   => true;
 
         public override bool Loaded()
@@ -112,7 +112,7 @@ namespace GridFlight
             foreach (BackstageViewPage page in setup.backstageView.Pages)
             {
                 if (page.Show && page.LinkText != null &&
-                    page.LinkText.IndexOf("Motor", StringComparison.OrdinalIgnoreCase) >= 0)
+                    page.LinkText.Equals("Motor Test", StringComparison.OrdinalIgnoreCase))
                 {
                     motorTestPage = page;
                     break;
