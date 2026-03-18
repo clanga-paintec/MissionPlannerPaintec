@@ -795,6 +795,15 @@
     <Content Include="mavextra.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="GridFlight\assets\missionplannergrid.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\logo2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\Gridflight-Icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="mpdesktop.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

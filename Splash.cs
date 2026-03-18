@@ -6,6 +6,8 @@ namespace MissionPlanner
 {
     public partial class Splash : Form
     {
+        internal static Splash instance;
+
         public Splash()
         {
             InitializeComponent();
@@ -19,7 +21,7 @@ namespace MissionPlanner
             if (Program.Logo != null)
             {
                 pictureBox1.BackgroundImage = MissionPlanner.Properties.Resources.bgdark;
-                pictureBox1.Image = Program.Logo;
+                pictureBox1.Image = Program.Logo2;
                 pictureBox1.Visible = true;
             }
 

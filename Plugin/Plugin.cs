@@ -100,6 +100,11 @@ namespace MissionPlanner.Plugin
             get { return MainV2.instance; }
         }
 
+        public Splash SplashForm
+        {
+            get { return Splash.instance; }
+        }
+
         /// <summary>
         /// access to all the current stats of the mav
         /// </summary>
