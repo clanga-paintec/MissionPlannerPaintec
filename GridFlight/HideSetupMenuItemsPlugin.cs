@@ -41,6 +41,8 @@ namespace GridFlight
         /// </summary>
         public override bool Init()
         {
+            if (!GridFlightProfile.IsPilot) return false;
+
             // FailSafe: comportamiento ante pérdida de señal RC/telemetría.
             // Oculto para simplificar el flujo del operador en campo.
             MainV2.DisplayConfiguration.displayFailSafe = false;

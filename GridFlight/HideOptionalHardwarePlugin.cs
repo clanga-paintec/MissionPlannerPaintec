@@ -87,6 +87,8 @@ namespace GridFlight
         /// </summary>
         public override bool Init()
         {
+            if (!GridFlightProfile.IsPilot) return false;
+
             var cfg = MainV2.DisplayConfiguration;
 
             // ── Items de Optional Hardware sin interés operativo ────────────────

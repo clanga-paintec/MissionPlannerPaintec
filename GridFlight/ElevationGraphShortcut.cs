@@ -7,6 +7,7 @@ using MissionPlanner;
 using MissionPlanner.Plugin;
 using MissionPlanner.Controls;
 using MissionPlanner.Utilities;
+using GridFlight;
 using SkiaSharp;
 
 namespace ElevationGraphShortcut
@@ -23,7 +24,7 @@ namespace ElevationGraphShortcut
         // sin desperdiciar CPU. Se usa para actualizar la visibilidad del botón.
         private const float _checkRateHz = 2f;
 
-        public override bool Init() => true;
+        public override bool Init() => GridFlightProfile.IsPilot;
 
         public override bool Loaded()
         {
