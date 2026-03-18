@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -21,7 +22,7 @@ namespace MissionPlanner
             if (Program.Logo != null)
             {
                 pictureBox1.BackgroundImage = MissionPlanner.Properties.Resources.bgdark;
-                pictureBox1.Image = Program.Logo;
+                pictureBox1.Image = Program.Logo2;
                 pictureBox1.Visible = true;
             }
 
