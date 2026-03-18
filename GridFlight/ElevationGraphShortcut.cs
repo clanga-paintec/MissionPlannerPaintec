@@ -32,8 +32,7 @@ namespace ElevationGraphShortcut
             _btnElevation.Image        = RenderElevationIcon(48);
             _btnElevation.ToolTipText  = "Open Elevation Profile for current mission";
             _btnElevation.Margin       = new Padding(4, 1, 0, 2);
-            // Oculto por defecto; Loop() lo muestra cuando hay un plan cargado.
-            _btnElevation.Visible      = false;
+            _btnElevation.Visible      = true;
             _btnElevation.Click       += BtnElevation_Click;
 
             var mainMenu = Host.MainForm.Controls.Find("MainMenu", true);
@@ -43,22 +42,6 @@ namespace ElevationGraphShortcut
             loopratehz = _checkRateHz;
             return true; // true = registrar en el loop activo de plugins
         }
-
-        /// <summary>
-        /// Actualiza la visibilidad del botón según si hay waypoints cargados.
-        /// Un plan válido tiene al menos 2 filas en Commands (fila 0 = HOME).
-        /// Loop() corre en hilo de fondo; la actualización de UI se delega a BeginInvoke.
-        /// </summary>
-        public override bool Loop()
-        {
-            bool hasPlan = Host.MainForm.FlightPlanner.Commands.Rows.Count > 1;
-
-            if (_btnElevation.Visible != hasPlan)
-                Host.MainForm.BeginInvoke((MethodInvoker)(() => _btnElevation.Visible = hasPlan));
-
-            return true;
-        }
-
         public override bool Exit() => true;
 
         private void BtnElevation_Click(object sender, EventArgs e)
