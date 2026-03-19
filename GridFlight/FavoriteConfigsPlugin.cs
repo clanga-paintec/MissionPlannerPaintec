@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MissionPlanner;
 using MissionPlanner.Controls;
+using MissionPlanner.GridFlight;
 using MissionPlanner.Plugin;
 using MissionPlanner.Utilities;
 using SkiaSharp;
@@ -33,15 +35,84 @@ namespace GridFlight
         public override string Version => "1.0";
         public override string Author  => "GridFlight";
 
+        private static ArrayList defaultConfigs = new ArrayList();
+
+        private static QuickConfig[] userConfigs;
+
+        private static string[] VTOL = new[]
+        {
+            "3",
+            "5",
+            "airspeed",
+            "groundspeed",
+            "alt",
+            "DistToHome",
+            "battery_voltage",
+            "battery_usedmah",
+            "verticalspeed",
+            "distTraveled",
+            "current",
+            "altasl",
+            "ter_alt",
+            "timeInAirMinSec",
+            "wind_vel",
+            "gimballng",
+            "gimballat",
+            "tot",
+            "toh"
+
+        };
+
+        private static string[] DRON = new[]
+        {
+            "3",
+            "5",
+            "ter_curalt",
+            "alt",
+            "DistToHome",
+            "battery_voltage",
+            "current",
+            "verticalspeed",
+            "distTraveled",
+            "battery_usedmah",
+            "altasl",
+            "ter_alt",
+            "timeInAirMinSec",
+            "wind_vel",
+            "wind_dir"
+        };
         public override bool Init() => GridFlightProfile.IsPilot;
 
         public override bool Loaded()
         {
+            defaultConfigs.Add(VTOL);
+            defaultConfigs.Add(DRON);
             AddToolbarButton();
             return false; // Sin loop periódico
         }
 
         public override bool Exit() => true;
+
+        // -- Cambiar Quick Tab menu --------------------------------------
+
+        private void ApplyQuickTabPreset(string[] fields)
+        {
+            Settings.Instance["quickViewCols"] = fields[0];
+            Settings.Instance["quickViewRows"] = fields[1];
+
+            for(int i = 2; i < fields.Length; i++)
+            {
+                Settings.Instance["quickView" + (i - 2)] = fields[i];
+            }
+
+            var fd = MainV2.instance?.FlightData;
+            if (fd == null) return;
+
+            fd.Invoke((Action)(() =>
+            {
+                fd.Activate();
+            }));
+        }
 
         // ── Botón en toolbar ────────────────────────────────────────────
 
@@ -58,7 +129,7 @@ namespace GridFlight
                 Margin       = new Padding(4, 1, 0, 2),
                 Image        = RenderStarIcon(24)
             };
-            btn.Click += (s, e) => ShowConfigManagerDialog();
+            
 
             // Insertar después del logo
             int logoIndex = toolStrip.Items.IndexOf(Host.MainForm.MenuArduPilot);
@@ -66,20 +137,46 @@ namespace GridFlight
                 toolStrip.Items.Insert(logoIndex + 1, btn);
             else
                 toolStrip.Items.Add(btn);
+            
+            btn.Click += Btn_Click;
+        }
+
+        private void Btn_Click(object sender, EventArgs e)
+        {
+            ShowConfigManagerDialog();
+        }
+
+        // -- Agregar una configuración -----------------------------------
+
+        private void addCustomConfig()
+        {
+            QuickConfig config;
+            string colms = Settings.Instance["quickViewColms"];
+            string rows = Settings.Instance["quickViewRows"];
+            
+            for(int i = 0; i < Settings.Instance.Count; i++)
+            {
+                
+                if (Settings.Instance[i])
+                {
+
+                } 
+            }
         }
 
         // ── Diálogo gestor de configuraciones ───────────────────────────
-
+        
         private void ShowConfigManagerDialog()
         {
-            var configsDir = GridFlightProfile.ConfigsDirectory;
+            int formSizeX = 500;
+            int formSizeY = 430;
 
             var form = new Form
             {
                 Text            = "Configuraciones Favoritas",
-                ClientSize      = new Size(500, 430),
+                ClientSize      = new Size(formSizeX, formSizeY),
                 FormBorderStyle = FormBorderStyle.FixedSingle,
-                StartPosition   = FormStartPosition.CenterScreen,
+                StartPosition   = FormStartPosition.CenterParent,
                 MinimizeBox     = false,
                 MaximizeBox     = false
             };
@@ -87,201 +184,100 @@ namespace GridFlight
             // ── Título ──
             var lblTitle = new Label
             {
-                Text     = "Configuraciones Guardadas",
+                Text     = "Configuraciones Prederteminadas",
                 Font     = new Font("Segoe UI", 11f, FontStyle.Bold),
                 Location = new Point(15, 12),
                 AutoSize = true
             };
 
-            // ── Lista ──
-            var listBox = new ListBox
+            // -- Configuración VTOL --
+
+            var btnVTOL = new PictureBox
             {
-                Location = new Point(15, 42),
-                Size     = new Size(355, 330),
-                Font     = new Font("Segoe UI", 9.5f)
+                Image = File.Exists(Path.Combine(Settings.GetRunningDirectory(), "GridFlight", "assets", "01_01.png")) ?
+                        new Bitmap(Path.Combine(Settings.GetRunningDirectory(), "GridFlight", "assets", "01_01.png")) :
+                        new Bitmap(Path.Combine(Settings.GetRunningDirectory(), "Resources", "01_01.png")),
+                Anchor = AnchorStyles.Top,
+                Location = new Point((formSizeX/defaultConfigs.Count)/2 - 25 , formSizeY/4),
+                Size = new Size(80,80),
+                SizeMode = PictureBoxSizeMode.Zoom
+
             };
 
-            // ── Botones (columna derecha) ──
-            int btnX = 385, btnW = 100, btnH = 36;
-
-            var btnSave = new Button
+            var nameVTOL = new Label
             {
-                Text      = "Guardar",
-                Location  = new Point(btnX, 42),
-                Size      = new Size(btnW, btnH),
+                Text = "VTOL",
+                Anchor = AnchorStyles.Bottom,
+                Location = new Point(btnVTOL.Location.X + btnVTOL.Width/4, btnVTOL.Location.Y + btnVTOL.Height + 5),
+            };
+
+            btnVTOL.Click += (s, e) =>
+            {
+                ApplyQuickTabPreset(VTOL);
+                form.Close();
+            };
+
+            // -- Configuración DRON
+
+            var btnDRON = new PictureBox
+            {
+                Image = File.Exists(Path.Combine(Settings.GetRunningDirectory(), "GridFlight", "assets", "01_05.png")) ?
+                        new Bitmap(Path.Combine(Settings.GetRunningDirectory(), "GridFlight", "assets", "01_05.png")) :
+                        new Bitmap(Path.Combine(Settings.GetRunningDirectory(), "Resources", "01_05.png")),
+                Anchor = AnchorStyles.Top,
+                Location = new Point(formSizeX / defaultConfigs.Count + (formSizeX / defaultConfigs.Count) / 2 - 25, formSizeY / 4),
+                Size = new Size(80, 80),
+                SizeMode = PictureBoxSizeMode.Zoom
+            };
+
+            btnDRON.Click += (s, e) =>
+            {
+                ApplyQuickTabPreset(DRON);
+                form.Close();
+            };
+
+            var nameDRON = new Label
+            {
+                Text = "DRON",
+                Anchor = AnchorStyles.Bottom,
+                Location = new Point(btnDRON.Location.X + btnDRON.Width/4, btnDRON.Location.Y + btnDRON.Height + 5),
+            };
+
+            var listConfig = new ListBox
+            {
+                Location = new Point(25, 270),
+                Size = new Size(450,100),
+                DataSource = userConfigs
+            };
+
+            var saveBtn = new Button
+            {
+                Text = "Guardar config",
+                Location = new Point(275,380),
+                Size = new Size(90,25),
                 FlatStyle = FlatStyle.Flat
             };
 
-            var btnLoad = new Button
+            var eraseBtn = new Button
             {
-                Text      = "Cargar",
-                Location  = new Point(btnX, 86),
-                Size      = new Size(btnW, btnH),
+                Text = "Borrar config",
+                Location = new Point(385,380),
+                Size = new Size(90,25),
                 FlatStyle = FlatStyle.Flat
             };
 
-            var btnDelete = new Button
-            {
-                Text      = "Eliminar",
-                Location  = new Point(btnX, 130),
-                Size      = new Size(btnW, btnH),
-                FlatStyle = FlatStyle.Flat
-            };
-
-            var btnImport = new Button
-            {
-                Text      = "Importar...",
-                Location  = new Point(btnX, 194),
-                Size      = new Size(btnW, btnH),
-                FlatStyle = FlatStyle.Flat
-            };
-
-            var lblStatus = new Label
-            {
-                Text     = "",
-                Location = new Point(15, 385),
-                Size     = new Size(470, 35),
-                Font     = new Font("Segoe UI", 8.5f)
-            };
-
-            // ── Poblar lista ──
-            Action refreshList = () =>
-            {
-                listBox.Items.Clear();
-                if (Directory.Exists(configsDir))
-                {
-                    foreach (var f in Directory.GetFiles(configsDir, "*.param").OrderBy(f => f))
-                        listBox.Items.Add(Path.GetFileNameWithoutExtension(f));
-                }
-            };
-            refreshList();
-
-            // ── Guardar configuración actual ──
-            btnSave.Click += (s, e) =>
-            {
-                if (!MainV2.comPort.BaseStream.IsOpen)
-                {
-                    lblStatus.Text = "No conectado. Conecta un vehículo primero.";
-                    return;
-                }
-
-                var configName = "";
-                if (InputBox.Show("Guardar Configuración",
-                        "Nombre para esta configuración:",
-                        ref configName) != DialogResult.OK
-                    || string.IsNullOrWhiteSpace(configName))
-                    return;
-
-                // Sanitizar nombre de archivo
-                foreach (var c in Path.GetInvalidFileNameChars())
-                    configName = configName.Replace(c, '_');
-
-                var filePath = Path.Combine(configsDir, configName + ".param");
-
-                if (File.Exists(filePath))
-                {
-                    var overwrite = MessageBox.Show(
-                        "La configuración '" + configName + "' ya existe.\n¿Sobrescribir?",
-                        "Confirmar",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
-                    if (overwrite != DialogResult.Yes) return;
-                }
-
-                // Convertir MAVLinkParamList a Hashtable
-                Dictionary<string, double> paramDict = MainV2.comPort.MAV.param;
-                var hashtable = new Hashtable();
-                foreach (var kv in paramDict)
-                    hashtable[kv.Key] = kv.Value;
-
-                ParamFile.SaveParamFile(filePath, hashtable);
-                lblStatus.Text = "Guardado: " + configName;
-                refreshList();
-            };
-
-            // ── Cargar configuración ──
-            btnLoad.Click += (s, e) =>
-            {
-                if (listBox.SelectedItem == null)
-                {
-                    lblStatus.Text = "Selecciona una configuración primero.";
-                    return;
-                }
-                if (!MainV2.comPort.BaseStream.IsOpen)
-                {
-                    lblStatus.Text = "No conectado. Conecta un vehículo primero.";
-                    return;
-                }
-
-                var name = listBox.SelectedItem.ToString();
-                var filePath = Path.Combine(configsDir, name + ".param");
-
-                var fileParams = ParamFile.loadParamFile(filePath);
-                Dictionary<string, double> currentParams = MainV2.comPort.MAV.param;
-
-                // ParamCompare con dgv=null aplica directamente vía setParam()
-                var compareForm = new ParamCompare(null, currentParams, fileParams);
-                ThemeManager.ApplyThemeTo(compareForm);
-                compareForm.ShowDialog();
-
-                if (compareForm.DialogResult == DialogResult.OK)
-                    lblStatus.Text = "Aplicado: " + name;
-            };
-
-            // ── Eliminar configuración ──
-            btnDelete.Click += (s, e) =>
-            {
-                if (listBox.SelectedItem == null)
-                {
-                    lblStatus.Text = "Selecciona una configuración primero.";
-                    return;
-                }
-
-                var name = listBox.SelectedItem.ToString();
-                var confirm = MessageBox.Show(
-                    "¿Eliminar la configuración '" + name + "'?",
-                    "Confirmar eliminación",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-
-                if (confirm == DialogResult.Yes)
-                {
-                    File.Delete(Path.Combine(configsDir, name + ".param"));
-                    lblStatus.Text = "Eliminado: " + name;
-                    refreshList();
-                }
-            };
-
-            // ── Importar desde archivo externo ──
-            btnImport.Click += (s, e) =>
-            {
-                using (var ofd = new OpenFileDialog
-                {
-                    Filter           = ParamFile.FileMask,
-                    RestoreDirectory = true
-                })
-                {
-                    if (ofd.ShowDialog() == DialogResult.OK)
-                    {
-                        var destName = Path.GetFileNameWithoutExtension(ofd.FileName);
-                        var dest = Path.Combine(configsDir, destName + ".param");
-                        File.Copy(ofd.FileName, dest, true);
-                        lblStatus.Text = "Importado: " + destName;
-                        refreshList();
-                    }
-                }
-            };
-
-            form.Controls.AddRange(new Control[]
-            {
-                lblTitle, listBox, btnSave, btnLoad,
-                btnDelete, btnImport, lblStatus
-            });
-
+            form.Controls.Add(lblTitle);
+            form.Controls.Add(btnVTOL);
+            form.Controls.Add(nameVTOL);
+            form.Controls.Add(btnDRON);
+            form.Controls.Add(nameDRON);
+            form.Controls.Add(listConfig);
+            form.Controls.Add(saveBtn);
+            form.Controls.Add(eraseBtn);
             ThemeManager.ApplyThemeTo(form);
             form.ShowDialog();
         }
-
+        
         // ── Icono estrella renderizado con SkiaSharp ────────────────────
 
         private static Image RenderStarIcon(int size)
