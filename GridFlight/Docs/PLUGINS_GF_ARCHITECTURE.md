@@ -13,7 +13,7 @@ GridFlight opera con dos perfiles mutuamente excluyentes:
 | Perfil | Descripcion | Plugins activos |
 |--------|-------------|-----------------|
 | **Piloto** | Experiencia GridFlight completa: tema ambar, menus simplificados, atajos, configuraciones favoritas | Todos (11) |
-| **Mecanico** | MissionPlanner original con branding GridFlight | Solo IconOverridePlugin, BrandingPlugin, ProfileSelectorPlugin |
+| **Mecanico** | MissionPlanner completo con branding GridFlight: tema ambar, test de motores, gestion de parametros, acceso total a hardware y configuracion | IconOverride, Branding, ProfileSelector, ModernTheme, FavoriteConfigs, MotorTestShortcut, FlightMode (7) |
 
 El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valores: `"Pilot"` / `"Mechanic"`). Los cambios de perfil requieren reinicio de la aplicacion porque `Init()` es el unico punto de control en el ciclo de vida de plugins.
 
@@ -44,9 +44,9 @@ El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valore
 - **Mecanismo:** Asigna `MainV2.displayicons` a `GridFlightMenuIcons`, que carga PNGs desde `GridFlight/assets/` con fallback a recursos embebidos de MissionPlanner
 - **Iconos reemplazados:** FlightData, FlightPlanner, InitialSetup, ConfigTune, Simulation, Terminal, Help, Connect, Disconnect
 
-### 2.2 Plugins de Tema y Simplificacion (solo Piloto)
+### 2.2 Plugins de Tema y Simplificacion
 
-#### `ModernThemePlugin.cs`
+#### `ModernThemePlugin.cs` (ambos perfiles)
 - **Proposito:** Tema moderno con paleta ambar oscura
 - **Fase:** `Loaded()` (ejecucion unica)
 - **Paleta principal:**
@@ -57,34 +57,35 @@ El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valore
 - **Fuente iconos:** Material Symbols Rounded (TTF cargado via `PrivateFontCollection`)
 - **Respeta:** `PreventThemingAttribute`, `Tag="custom"`
 
-#### `HideOptionalHardwarePlugin.cs`
+#### `HideOptionalHardwarePlugin.cs` (solo Piloto)
 - **Proposito:** Oculta items irrelevantes de Optional Hardware (Setup)
 - **Fase:** `Init()` para flags + `Loop()` a 1 Hz para CubeID
 - **Flags desactivados (18):** displayRTKInject, displaySikRadio, displayGPSOrder, displayBattMonitor, displayCAN, displayJoystick, displayCompassMotorCalib, displayRangeFinder, displayAirSpeed, displayPx4Flow, displayOpticalFlow, displayOsd, displayCameraGimbal, displayAntennaTracker, displayBluetooth, displayParachute, displayEsp, displayFFTSetup
 - **Caso especial:** CubeID Update no tiene flag en `DisplayView`; se oculta via `BackstageViewPage.Show = false` en cada visita al tab Setup (InitialSetup se recrea cada vez)
 - **Preserva:** Motor Test (unico item relevante para operacion)
 
-#### `HideSetupMenuItemsPlugin.cs`
+#### `HideSetupMenuItemsPlugin.cs` (solo Piloto)
 - **Proposito:** Oculta items avanzados de Mandatory Hardware
 - **Fase:** `Init()` (ejecucion unica, sin loop)
 - **Flags desactivados (3):** displayFailSafe, displayHWIDs, displayADSB
 
-### 2.3 Plugins de Atajos Operativos (solo Piloto)
+### 2.3 Plugins de Atajos Operativos
 
-#### `WriteVerifyPlugin.cs`
+#### `WriteVerifyPlugin.cs` (solo Piloto)
 - **Proposito:** Boton "Write and Verify" en FlightPlanner
 - **Fase:** `Loaded()` (ejecucion unica)
 - **Ubicacion:** `FlightPlanner.panel5` en posicion (3, 90), tamano 115x23
 - **Accion:** Ejecuta `BUT_write_Click()` seguido de `BUT_read_Click()` para escribir y verificar la mision
 
-#### `MotorTestShortcut.cs`
+#### `MotorTestShortcut.cs` (ambos perfiles, comportamiento diferenciado)
 - **Proposito:** Acceso rapido a Motor Test desde el toolbar
 - **Fase:** `Loaded()` + `Loop()` a 2 Hz
-- **Visibilidad:** Solo cuando SITL esta activo (`SITL.SITLSEND.Client.Connected`)
+- **Visibilidad Piloto:** Solo cuando SITL esta activo (`SITL.SITLSEND.Client.Connected`)
+- **Visibilidad Mecanico:** Cuando hay vehiculo conectado (`MainV2.comPort.BaseStream.IsOpen`)
 - **Accion:** Navega a Setup > activa la pagina "Motor Test" del BackstageView
 - **Icono:** `engine.png` desde `GridFlight/assets/`
 
-#### `ElevationGraphShortcut.cs`
+#### `ElevationGraphShortcut.cs` (solo Piloto)
 - **Namespace:** `ElevationGraphShortcut` (diferente al resto)
 - **Proposito:** Acceso rapido al perfil de elevacion
 - **Fase:** `Loaded()` + `Loop()` a 2 Hz
@@ -100,7 +101,7 @@ El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valore
 - **Toolbar:** `ToolStripDropDownButton` mostrando "PILOTO" o "MECANICO" con dropdown para cambiar
 - **Cambio de perfil:** Persiste en config.xml + solicita reinicio via `Application.Restart()`
 
-#### `FavoriteConfigsPlugin.cs`
+#### `FavoriteConfigsPlugin.cs` (ambos perfiles)
 - **Proposito:** Gestor de configuraciones favoritas de parametros de dron
 - **Fase:** `Loaded()` (ejecucion unica)
 - **Icono:** Estrella ambar de 5 puntas renderizada con SkiaSharp
@@ -197,18 +198,18 @@ Los archivos `.cs` en `GridFlight/` se incluyen automaticamente por el globbing 
        └─ InitPlugin("self")  ← descubre los 11 plugins GridFlight
            ├─ GridFlightProfile.IsPilot? ← lee Settings
            ├─ [Pilot] Todos los plugins pasan Init()
-           └─ [Mechanic] Solo Branding, Icons, ProfileSelector pasan Init()
+           └─ [Mechanic] Branding, Icons, ProfileSelector, ModernTheme, FavoriteConfigs, MotorTest, FlightMode pasan Init()
 
 4. PluginInit()  ← llama Loaded() en cada plugin aceptado
    ├─ ProfileSelectorPlugin.Loaded()
    │   ├─ IsFirstLaunch? → Dialogo de seleccion (modal)
    │   └─ Añade dropdown de perfil al toolbar
-   ├─ ModernThemePlugin.Loaded() → Aplica tema ambar [solo Pilot]
+   ├─ ModernThemePlugin.Loaded() → Aplica tema ambar [ambos perfiles]
    ├─ BrandingPlugin.Loaded() → Logo + icono + URL
    ├─ WriteVerifyPlugin.Loaded() → Boton Write & Verify [solo Pilot]
-   ├─ MotorTestShortcut.Loaded() → Boton Motor Test [solo Pilot]
+   ├─ MotorTestShortcut.Loaded() → Boton Motor Test [ambos perfiles]
    ├─ ElevationGraphShortcut.Loaded() → Boton elevacion [solo Pilot]
-   ├─ FavoriteConfigsPlugin.Loaded() → Boton estrella [solo Pilot]
+   ├─ FavoriteConfigsPlugin.Loaded() → Boton estrella [ambos perfiles]
    └─ FlightModePlugin.Loaded() → Reordena grid + filtro modos [todos]
 
 5. Loop de plugins (hilo de fondo, MainV2.cs:2497-2537)

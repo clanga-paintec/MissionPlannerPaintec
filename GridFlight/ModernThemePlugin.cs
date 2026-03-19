@@ -161,7 +161,7 @@ namespace GridFlight
 
       #region Plugin Lifecycle
 
-        public override bool Init() => GridFlightProfile.IsPilot;
+        public override bool Init() => true;
 
         public override bool Loaded()
         {

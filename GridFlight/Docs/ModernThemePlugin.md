@@ -1,7 +1,7 @@
 # ModernThemePlugin
 
 **Archivo:** `GridFlight/ModernThemePlugin.cs`
-**Perfil:** Solo Piloto
+**Perfil:** Ambos perfiles
 **Fase:** `Loaded()` (ejecucion unica)
 
 ## Que hace

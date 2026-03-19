@@ -43,7 +43,7 @@ namespace GridFlight
             var form = new Form
             {
                 Text            = "GridFlight - Seleccionar Perfil",
-                ClientSize      = new Size(400, 280),
+                ClientSize      = new Size(400, 310),
                 FormBorderStyle = FormBorderStyle.FixedSingle,
                 StartPosition   = FormStartPosition.CenterScreen,
                 MinimizeBox     = false,
@@ -100,6 +100,15 @@ namespace GridFlight
                 ForeColor = Color.FromArgb(245, 245, 245)
             };
 
+            var lblMechanicDesc = new Label
+            {
+                Text     = "MissionPlanner completo con branding GridFlight:\n" +
+                           "tema ámbar, test de motores, gestión de parámetros.",
+                Font     = new Font("Segoe UI", 8f),
+                Location = new Point(20, 250),
+                Size     = new Size(360, 30)
+            };
+
             btnPilot.Click += (s, e) =>
             {
                 GridFlightProfile.Set(GridFlightProfile.Pilot);
@@ -116,7 +125,7 @@ namespace GridFlight
             };
 
             form.Controls.AddRange(new Control[]
-                { lblTitle, lblDesc, btnPilot, lblPilotDesc, btnMechanic });
+                { lblTitle, lblDesc, btnPilot, lblPilotDesc, btnMechanic, lblMechanicDesc });
 
             ThemeManager.ApplyThemeTo(form);
             form.ShowDialog();
