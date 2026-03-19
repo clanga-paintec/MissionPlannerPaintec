@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(grep -ri \"BUT_set\\\\|setmode\" \"C:\\\\Users\\\\PAINTEC\\\\source\\\\repos\\\\MissionPlannerPaintec\" --include=\"*.cs\" -l 2>/dev/null | head -10)",
-      "Bash(grep -ri \"BUT_set\" \"C:\\\\Users\\\\PAINTEC\\\\source\\\\repos\\\\MissionPlannerPaintec\" --include=\"*.cs\" -l 2>/dev/null | head -10)"
+      "Bash(grep -ri \"BUT_set\" \"C:\\\\Users\\\\PAINTEC\\\\source\\\\repos\\\\MissionPlannerPaintec\" --include=\"*.cs\" -l 2>/dev/null | head -10)",
+      "Bash(msbuild MissionPlanner.sln /p:Configuration=Release /p:Platform=\"Any CPU\" /t:Build /v:minimal)",
+      "Bash(dotnet --version)",
+      "Read(//c/Program Files/Microsoft Visual Studio//**)",
+      "Read(//mnt/c/Program Files/**)",
+      "Bash(\"/c/Program Files/dotnet/dotnet\" build MissionPlanner.sln -c Release --no-incremental)",
+      "Bash(\"/c/Program Files/dotnet/dotnet\" build ExtLibs/LEDBulb/Bulb/Bulb.csproj -c Release)"
     ]
   }
 }
