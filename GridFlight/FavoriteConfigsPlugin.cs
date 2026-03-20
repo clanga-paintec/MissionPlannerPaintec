@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using BruTile.Wmts.Generated;
 using MissionPlanner;
 using MissionPlanner.Controls;
 using MissionPlanner.GridFlight;
@@ -37,9 +38,9 @@ namespace GridFlight
 
         private static ArrayList defaultConfigs = new ArrayList();
 
-        private static QuickConfig[] userConfigs;
+        private static ArrayList userConfigs = new ArrayList();
 
-        private static string[] VTOL = new[]
+        private static List<string> VTOL = new List<string>
         {
             "3",
             "5",
@@ -63,7 +64,7 @@ namespace GridFlight
 
         };
 
-        private static string[] DRON = new[]
+        private static List<string> DRON = new List<string>
         {
             "3",
             "5",
@@ -95,14 +96,14 @@ namespace GridFlight
 
         // -- Cambiar Quick Tab menu --------------------------------------
 
-        private void ApplyQuickTabPreset(string[] fields)
+        private void ApplyQuickTabPreset(List<string> fields)
         {
-            Settings.Instance["quickViewCols"] = fields[0];
-            Settings.Instance["quickViewRows"] = fields[1];
+            Settings.Instance["quickViewColms"] = fields.ElementAt(0);
+            Settings.Instance["quickViewRows"] = fields.ElementAt(1);
 
-            for(int i = 2; i < fields.Length; i++)
+            for(int i = 2; i < fields.Count; i++)
             {
-                Settings.Instance["quickView" + (i - 2)] = fields[i];
+                Settings.Instance["quickView" + (i - 2)] = fields.ElementAt(i);
             }
 
             var fd = MainV2.instance?.FlightData;
@@ -148,20 +149,26 @@ namespace GridFlight
 
         // -- Agregar una configuración -----------------------------------
 
-        private void addCustomConfig()
+        private void SaveCustomConfig()
         {
-            QuickConfig config;
+            List<string> newParams = new List<string>();
             string colms = Settings.Instance["quickViewColms"];
             string rows = Settings.Instance["quickViewRows"];
-            
-            for(int i = 0; i < Settings.Instance.Count; i++)
-            {
-                
-                if (Settings.Instance[i])
-                {
+            newParams.Add(colms);
+            newParams.Add(rows);
+            int qvCounter = 0;
 
-                } 
+            for(int i = 2; i < Settings.Instance.Count; i++)
+            {
+                if (Settings.Instance["quickView" +  i] != null)
+                {
+                    newParams.Add(Settings.Instance["quickView" + qvCounter]);
+                    qvCounter++;
+                }
             }
+
+            QuickConfig newConfig = new QuickConfig("Config_Prueba", newParams);
+            QuickConfig.SaveQuickConfig(newConfig);
         }
 
         // ── Diálogo gestor de configuraciones ───────────────────────────
@@ -170,6 +177,7 @@ namespace GridFlight
         {
             int formSizeX = 500;
             int formSizeY = 430;
+            Size btnSize = new Size(90, 25);
 
             var form = new Form
             {
@@ -247,23 +255,54 @@ namespace GridFlight
             {
                 Location = new Point(25, 270),
                 Size = new Size(450,100),
-                DataSource = userConfigs
+                DataSource = QuickConfig.AllQuickConfigs(),
+                HorizontalScrollbar = true
             };
 
             var saveBtn = new Button
             {
                 Text = "Guardar config",
-                Location = new Point(275,380),
-                Size = new Size(90,25),
+                Location = new Point(185,380),
+                Size = btnSize,
                 FlatStyle = FlatStyle.Flat
+            };
+
+            saveBtn.Click += (s, e) =>
+            {
+                AskForName();
+                //SaveCustomConfig();
+                
+            };
+
+            var loadBtn = new Button
+            {
+                Text = "Cargar config",
+                Location = new Point(285, 380),
+                Size = btnSize,
+                FlatStyle = FlatStyle.Flat
+            };
+
+            loadBtn.Click += (s, e) =>
+            {
+                ApplyQuickTabPreset((QuickConfig.LoadQuickConfig(listConfig.GetItemText(listConfig.SelectedItem)).getParams()));
+                form.Close();
             };
 
             var eraseBtn = new Button
             {
                 Text = "Borrar config",
                 Location = new Point(385,380),
-                Size = new Size(90,25),
+                Size = btnSize,
                 FlatStyle = FlatStyle.Flat
+            };
+
+            eraseBtn.Click += (s, e) =>
+            {
+                if (listConfig.SelectedItem is QuickConfig selected)
+                {
+                    QuickConfig.EraseQuickConfig(selected.getName());
+                    form.Close();
+                }
             };
 
             form.Controls.Add(lblTitle);
@@ -273,11 +312,41 @@ namespace GridFlight
             form.Controls.Add(nameDRON);
             form.Controls.Add(listConfig);
             form.Controls.Add(saveBtn);
+            form.Controls.Add(loadBtn);
             form.Controls.Add(eraseBtn);
             ThemeManager.ApplyThemeTo(form);
             form.ShowDialog();
         }
         
+        private void AskForName()
+        {
+            var form = new Form
+            {
+                Text = "Introducir Nombre",
+                ClientSize = new Size(300, 200),
+                FormBorderStyle = FormBorderStyle.FixedSingle,
+                StartPosition = FormStartPosition.CenterParent,
+                MinimizeBox = false,
+                MaximizeBox = false
+            };
+
+            var lblText = new Label
+            {
+                Text = "Introduce un Nombre",
+                Font = new Font("Segoe UI", 11f, FontStyle.Bold),
+                Location = new Point(75, 25),
+                AutoSize = true
+            };
+
+            var textBox = new TextBox
+            {
+                BackColor = Color.White
+            };
+
+            form.Controls.Add(lblText);
+            ThemeManager.ApplyThemeTo(form);
+            form.ShowDialog();
+        }
         // ── Icono estrella renderizado con SkiaSharp ────────────────────
 
         private static Image RenderStarIcon(int size)
