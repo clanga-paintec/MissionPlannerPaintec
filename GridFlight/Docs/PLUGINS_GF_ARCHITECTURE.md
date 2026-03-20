@@ -2,7 +2,7 @@
 
 ## 1. Arquitectura General
 
-GridFlight extiende MissionPlanner mediante un sistema de **12 plugins** que se compilan dentro del ensamblado principal (`MissionPlanner.exe`). Los plugins se descubren automaticamente por reflexion en `PluginLoader.InitPlugin("self")` y siguen el ciclo de vida estandar: `Init()` > `Loaded()` > `Loop()` > `Exit()`.
+GridFlight extiende MissionPlanner mediante un sistema de **15 plugins** que se compilan dentro del ensamblado principal (`MissionPlanner.exe`). Los plugins se descubren automaticamente por reflexion en `PluginLoader.InitPlugin("self")` y siguen el ciclo de vida estandar: `Init()` > `Loaded()` > `Loop()` > `Exit()`.
 
 Todas las personalizaciones siguen el **principio Open/Closed**: se extiende la funcionalidad sin modificar el codigo fuente de MissionPlanner, salvo 1 archivo con cambios minimos marcados con bloques `// GRIDFLIGHT CHANGES` (anteriormente eran 3, pero los cambios de FlightData.cs y FlightData.Designer.cs fueron migrados al plugin `FlightModePlugin`).
 
@@ -12,8 +12,8 @@ GridFlight opera con dos perfiles mutuamente excluyentes:
 
 | Perfil | Descripcion | Plugins activos |
 |--------|-------------|-----------------|
-| **Piloto** | Experiencia GridFlight completa: tema ambar, menus simplificados, atajos, configuraciones favoritas | Todos (11) |
-| **Mecanico** | MissionPlanner completo con branding GridFlight: tema ambar, test de motores, gestion de parametros, acceso total a hardware y configuracion | IconOverride, Branding, ProfileSelector, ModernTheme, FavoriteConfigs, MotorTestShortcut, FlightMode (7) |
+| **Piloto** | Experiencia GridFlight completa: tema ambar, menus simplificados, atajos, configuraciones favoritas, checklist pre-vuelo, reporte de mision | Todos (14) |
+| **Mecanico** | MissionPlanner completo con branding GridFlight: tema ambar, test de motores, gestion de parametros, registro de mantenimiento, acceso total a hardware y configuracion | IconOverride, Branding, ProfileSelector, ModernTheme, FavoriteConfigs, MotorTestShortcut, FlightMode, PreFlightChecklist, MaintenanceLog, MissionReport (10) |
 
 El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valores: `"Pilot"` / `"Mechanic"`). Los cambios de perfil requieren reinicio de la aplicacion porque `Init()` es el unico punto de control en el ciclo de vida de plugins.
 
@@ -100,6 +100,7 @@ El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valore
 - **Primer arranque:** Dialogo modal con dos opciones (PILOTO / MECANICO)
 - **Toolbar:** `ToolStripDropDownButton` mostrando "PILOTO" o "MECANICO" con dropdown para cambiar
 - **Cambio de perfil:** Persiste en config.xml + solicita reinicio via `Application.Restart()`
+- **Contrasena Mecanico:** El perfil Mecanico requiere contrasena (default configurable). Se valida al seleccionar el perfil y se puede cambiar desde el dropdown. Persiste en `Settings.Instance["GridFlight_MechanicPassword"]`.
 
 #### `FavoriteConfigsPlugin.cs` (ambos perfiles)
 - **Proposito:** Gestor de configuraciones favoritas de parametros de dron
@@ -118,7 +119,30 @@ El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valore
 - **Clave Settings:** `GridFlight_Profile`
 - **Defensa:** Try-catch en `Current` con default a "Pilot"; `IsPilot = !IsMechanic` para que cualquier valor inesperado se trate como Piloto
 
-### 2.5 Plugins de Control de Vuelo (todos los perfiles)
+### 2.5 Plugins de Seguridad (ambos perfiles)
+
+#### `PreFlightChecklistPlugin.cs` (ambos perfiles)
+- **Proposito:** Habilita el tab PreFlight en FlightData y proporciona checklist default para drones
+- **Fase:** `Init()` (flags de visibilidad) + `Loaded()` (boton toolbar)
+- **Icono:** Clipboard ambar renderizado con SkiaSharp
+- **Checklist:** 8 checks automaticos (bateria, GPS, prearm, failsafe, enlace) + 6 manuales
+- **Infraestructura:** Reutiliza CheckListControl + CheckListItem de MissionPlanner
+
+#### `MaintenanceLogPlugin.cs` (solo Mecanico)
+- **Proposito:** Registro local de mantenimientos del dron
+- **Fase:** `Loaded()` (ejecucion unica)
+- **Icono:** Llave ambar renderizada con SkiaSharp
+- **Almacenamiento:** `GridFlight/configs/maintenanceLog.json`
+- **Operaciones:** Añadir, eliminar, visualizar historial
+
+#### `MissionReportPlugin.cs` (ambos perfiles)
+- **Proposito:** Genera reportes HTML post-vuelo con estadisticas de la mision
+- **Fase:** `Loaded()` + `Loop()` a 1 Hz (rastreo de datos en vuelo)
+- **Icono:** Documento ambar renderizado con SkiaSharp
+- **Datos rastreados:** Altitud max, velocidad max, bateria, modos usados, distancia, duracion
+- **Output:** HTML con tema GridFlight en `GridFlight/configs/reports/`
+
+### 2.7 Plugins de Control de Vuelo (todos los perfiles)
 
 #### `FlightModePlugin.cs`
 - **Proposito:** Control de seleccion de modos de vuelo en tab Actions
@@ -195,10 +219,10 @@ Los archivos `.cs` en `GridFlight/` se incluyen automaticamente por el globbing 
 3. MainV2.LoadAll()
    ├─ PluginLoader.DisabledPluginNames ← desde Settings
    └─ PluginLoader.LoadAll()
-       └─ InitPlugin("self")  ← descubre los 11 plugins GridFlight
+       └─ InitPlugin("self")  ← descubre los 14 plugins GridFlight
            ├─ GridFlightProfile.IsPilot? ← lee Settings
            ├─ [Pilot] Todos los plugins pasan Init()
-           └─ [Mechanic] Branding, Icons, ProfileSelector, ModernTheme, FavoriteConfigs, MotorTest, FlightMode pasan Init()
+           └─ [Mechanic] Branding, Icons, ProfileSelector, ModernTheme, FavoriteConfigs, MotorTest, FlightMode, PreFlightChecklist, MaintenanceLog, MissionReport pasan Init()
 
 4. PluginInit()  ← llama Loaded() en cada plugin aceptado
    ├─ ProfileSelectorPlugin.Loaded()
@@ -210,13 +234,17 @@ Los archivos `.cs` en `GridFlight/` se incluyen automaticamente por el globbing 
    ├─ MotorTestShortcut.Loaded() → Boton Motor Test [ambos perfiles]
    ├─ ElevationGraphShortcut.Loaded() → Boton elevacion [solo Pilot]
    ├─ FavoriteConfigsPlugin.Loaded() → Boton estrella [ambos perfiles]
-   └─ FlightModePlugin.Loaded() → Reordena grid + filtro modos [todos]
+   ├─ FlightModePlugin.Loaded() → Reordena grid + filtro modos [todos]
+   ├─ PreFlightChecklistPlugin.Loaded() → Despliega checklist + boton clipboard [ambos perfiles]
+   ├─ MaintenanceLogPlugin.Loaded() → Boton llave para registro mantenimiento [solo Mechanic]
+   └─ MissionReportPlugin.Loaded() → Boton documento para reportes post-vuelo [ambos perfiles]
 
 5. Loop de plugins (hilo de fondo, MainV2.cs:2497-2537)
    ├─ IconOverridePlugin.Loop() → Aplica iconos (0.2 Hz, disparo unico)
    ├─ HideOptionalHardwarePlugin.Loop() → Oculta CubeID (1 Hz)
    ├─ MotorTestShortcut.Loop() → Visibilidad SITL (2 Hz)
-   └─ ElevationGraphShortcut.Loop() → Visibilidad waypoints (2 Hz)
+   ├─ ElevationGraphShortcut.Loop() → Visibilidad waypoints (2 Hz)
+   └─ MissionReportPlugin.Loop() → Rastreo de stats de vuelo (1 Hz)
 ```
 
 ---
@@ -259,7 +287,10 @@ GridFlight/
 │       ├── recolor_green_to_amber.py
 │       └── environment.yml
 ├── configs/                     (creado en runtime)
-│   └── *.param                  (configuraciones guardadas)
+│   ├── *.param                  (configuraciones guardadas)
+│   ├── checklistGridFlight.xml  (checklist default para drones)
+│   ├── maintenanceLog.json      (historial de mantenimientos - creado en runtime)
+│   └── reports/                 (reportes HTML post-vuelo - creado en runtime)
 ├── BrandingPlugin.cs
 ├── ElevationGraphShortcut.cs
 ├── FavoriteConfigsPlugin.cs
@@ -272,6 +303,9 @@ GridFlight/
 ├── ProfileSelectorPlugin.cs
 ├── FlightModePlugin.cs
 ├── WriteVerifyPlugin.cs
+├── PreFlightChecklistPlugin.cs
+├── MaintenanceLogPlugin.cs
+├── MissionReportPlugin.cs
 └── Docs/
     ├── ARCHITECTURE.md          (este documento)
     ├── BrandingPlugin.md
@@ -285,5 +319,8 @@ GridFlight/
     ├── ModernThemePlugin.md
     ├── MotorTestShortcut.md
     ├── ProfileSelectorPlugin.md
-    └── WriteVerifyPlugin.md
+    ├── WriteVerifyPlugin.md
+    ├── PreFlightChecklistPlugin.md
+    ├── MaintenanceLogPlugin.md
+    └── MissionReportPlugin.md
 ```

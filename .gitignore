@@ -1,5 +1,6 @@
 # GridFlight — archivos locales de desarrollo, no subir al repo
 CLAUDE.md
+AGENTS.md
 MISSION_PLANNER_DOCS.md
 GridFlight/bitacora/
 
@@ -37,7 +38,7 @@ packages/
 /ExtLibs/UsbSerialForAndroid/usb-serial-for-android-3.3.0
 /ExtLibs/Xamarin/opentk
 *.binlog
-docs/
+/docs/
 *.Test/
 *.jar
 *.cache
