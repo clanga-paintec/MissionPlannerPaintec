@@ -804,6 +804,18 @@
     <Content Include="GridFlight\assets\Gridflight-Icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="GridFlight\assets\01_01.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\01_03.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\01_05.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GridFlight\assets\01_06.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="mpdesktop.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

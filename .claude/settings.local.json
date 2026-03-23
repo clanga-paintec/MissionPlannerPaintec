@@ -8,7 +8,9 @@
       "Read(//c/Program Files/Microsoft Visual Studio//**)",
       "Read(//mnt/c/Program Files/**)",
       "Bash(\"/c/Program Files/dotnet/dotnet\" build MissionPlanner.sln -c Release --no-incremental)",
-      "Bash(\"/c/Program Files/dotnet/dotnet\" build ExtLibs/LEDBulb/Bulb/Bulb.csproj -c Release)"
+      "Bash(\"/c/Program Files/dotnet/dotnet\" build ExtLibs/LEDBulb/Bulb/Bulb.csproj -c Release)",
+      "Bash(grep:*)",
+      "Bash(find C:UsersPAINTECDocumentsGitHubMissionPlannerPaintec -name *.csproj -not -path */ExtLibs/* -not -path */mono/*)"
     ]
   }
 }

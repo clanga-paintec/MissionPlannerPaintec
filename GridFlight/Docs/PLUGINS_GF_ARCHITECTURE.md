@@ -104,12 +104,11 @@ El perfil se persiste en `config.xml` bajo la clave `GridFlight_Profile` (valore
 - **Proposito:** Gestor de configuraciones favoritas de parametros de dron
 - **Fase:** `Loaded()` (ejecucion unica)
 - **Icono:** Estrella ambar de 5 puntas renderizada con SkiaSharp
-- **Almacenamiento:** Archivos `.param` en `GridFlight/configs/`
+- **Almacenamiento:** Arrays de cadenas de texto en `Settings` usando QuickConfig.cs
 - **Operaciones:**
-  - **Guardar:** Lee `MainV2.comPort.MAV.param` > pide nombre > `ParamFile.SaveParamFile()`
-  - **Cargar:** `ParamFile.loadParamFile()` > `ParamCompare(null, current, file)` para comparar y aplicar selectivamente via MAVLink
-  - **Eliminar:** Borra archivo `.param` con confirmacion
-  - **Importar:** Copia `.param` externo al directorio de configuraciones
+  - **Guardar:** Lee `Settings.Instance` > pide nombre > `QuickConfig.SaveQuickConfig(QuickConfig qc)`
+  - **Cargar:** `QuickConfig.LoadQuickConfig(string name)` > `Settings.Instance` y lo carga en FlightData.cs, QuickTab
+  - **Eliminar:** Borra List de `Settings` con confirmacion
 
 #### `GridFlightProfile.cs`
 - **Tipo:** Clase estatica de utilidad (no es un plugin)

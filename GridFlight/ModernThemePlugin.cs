@@ -50,7 +50,7 @@ namespace GridFlight
             public static readonly Color Background = Color.FromArgb(24, 24, 24);   // #181818
             public static readonly Color Surface = Color.FromArgb(33, 33, 33);      // #212121
             public static readonly Color SurfaceElevated = Color.FromArgb(45, 45, 45); // #2D2D2D
-            public static readonly Color SurfaceInput = Color.FromArgb(20, 20, 20);  // #141414
+            public static readonly Color SurfaceInput = Color.FromArgb(122, 122, 122);  // #7A7A7A
 
             // ── Acentos ────────────────────────────────────────────────────
             public static readonly Color Primary = Color.FromArgb(255, 193, 7);  // #FFC107 Amber
