@@ -36,8 +36,7 @@ namespace GridFlight
         public override string Version => "1.0";
         public override string Author  => "GridFlight";
 
-        
-        // -- Configuraciones predefinidas --
+        // -- Configuraciones predefinidas
 
         private static ArrayList defaultConfigs = new ArrayList();
 
@@ -83,9 +82,8 @@ namespace GridFlight
             "wind_vel",
             "wind_dir"
         };
-        
         public override bool Init() => true;
-        
+
         public override bool Loaded()
         {
             defaultConfigs.Add(VTOL);
@@ -127,10 +125,14 @@ namespace GridFlight
 
             var btn = new ToolStripButton
             {
-                DisplayStyle = ToolStripItemDisplayStyle.Image,
+                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
+                TextImageRelation = TextImageRelation.ImageAboveText, 
                 ToolTipText  = "Configuraciones Favoritas",
                 Margin       = new Padding(4, 1, 0, 2),
-                Image        = RenderStarIcon(24)
+                Image        = RenderStarIcon(20),
+                Text = "CONFIGS",
+                Font = new Font("Segoe UI", 8f),
+                AutoSize = true
             };
             
 

@@ -140,7 +140,7 @@ namespace GridFlight
                 form.Close();
                 // Los plugins Pilot-only ya cargaron (default es Pilot).
                 // Necesitamos reiniciar para que Init() los bloquee.
-                PromptRestart();
+                //PromptRestart();
             };
 
             form.Controls.AddRange(new Control[]

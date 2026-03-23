@@ -29,12 +29,15 @@ namespace ElevationGraphShortcut
         public override bool Loaded()
         {
             _btnElevation = new ToolStripButton();
-            _btnElevation.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            _btnElevation.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            _btnElevation.TextImageRelation = TextImageRelation.ImageAboveText;
             _btnElevation.Image        = RenderElevationIcon(48);
             _btnElevation.ToolTipText  = "Open Elevation Profile for current mission";
             _btnElevation.Margin       = new Padding(4, 1, 0, 2);
             _btnElevation.Visible      = true;
             _btnElevation.Click       += BtnElevation_Click;
+            _btnElevation.Text = "ELEVATION";
+            _btnElevation.Font = new Font("Segoe UI", 8f);
 
             var mainMenu = Host.MainForm.Controls.Find("MainMenu", true);
             if (mainMenu.Length > 0 && mainMenu[0] is ToolStrip toolStrip)

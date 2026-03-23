@@ -131,8 +131,11 @@ namespace GridFlight
 
             var btn = new ToolStripButton
             {
-                DisplayStyle = ToolStripItemDisplayStyle.Image,
-                ToolTipText  = "Generar Reporte de Misión",
+                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
+                TextImageRelation = TextImageRelation.ImageAboveText,
+                Text = "REPORT",
+                Font = new Font("Segoe UI", 8f),
+                ToolTipText  = "Mission Report",
                 Margin       = new Padding(4, 1, 0, 2),
                 Image        = RenderReportIcon(24)
             };

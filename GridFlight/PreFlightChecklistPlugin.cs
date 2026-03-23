@@ -92,10 +92,13 @@ namespace GridFlight
 
             var btn = new ToolStripButton
             {
-                DisplayStyle = ToolStripItemDisplayStyle.Image,
+                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
                 ToolTipText  = "Pre-Flight Checklist",
                 Margin       = new Padding(4, 1, 0, 2),
-                Image        = RenderChecklistIcon(24)
+                Image        = RenderChecklistIcon(18),
+                TextImageRelation = TextImageRelation.ImageAboveText,
+                Text = "CHECKLIST",
+                Font = new Font("Segoe UI", 8f)
             };
             btn.Click += BtnPreFlight_Click;
 
