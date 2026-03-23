@@ -36,7 +36,7 @@ namespace GridFlight
         // sin desperdiciar CPU. Se usa para actualizar la visibilidad del botón.
         private const float _checkRateHz = 2f;
 
-        public override bool Init()   => GridFlightProfile.IsPilot;
+        public override bool Init()   => true;
         public override bool Exit()   => true;
 
         public override bool Loaded()
@@ -47,7 +47,9 @@ namespace GridFlight
 
             _btn = new ToolStripButton();
             _btn.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _btn.ToolTipText  = "Motor Test (Setup → Optional Hardware)";
+            _btn.ToolTipText  = GridFlightProfile.IsMechanic
+                ? "Motor Test (conectar vehículo primero)"
+                : "Motor Test (Setup → Optional Hardware)";
             // Left margin gives breathing room from the logo; no excessive gap.
             _btn.Margin       = new Padding(8, 1, 0, 2);
             _btn.Image        = LoadEngineIcon();
@@ -74,11 +76,22 @@ namespace GridFlight
         /// </summary>
         public override bool Loop()
         {
-            bool sitlActive = MissionPlanner.GCSViews.SITL.SITLSEND != null
-                              && MissionPlanner.GCSViews.SITL.SITLSEND.Client.Connected;
+            bool shouldShow;
 
-            if (_btn.Visible != sitlActive)
-                Host.MainForm.BeginInvoke((MethodInvoker)(() => _btn.Visible = sitlActive));
+            if (GridFlightProfile.IsMechanic)
+            {
+                // Mecánico: visible cuando hay vehículo conectado (real o SITL)
+                shouldShow = MainV2.comPort.BaseStream.IsOpen;
+            }
+            else
+            {
+                // Piloto: visible solo durante simulación SITL (seguridad)
+                shouldShow = MissionPlanner.GCSViews.SITL.SITLSEND != null
+                             && MissionPlanner.GCSViews.SITL.SITLSEND.Client.Connected;
+            }
+
+            if (_btn.Visible != shouldShow)
+                Host.MainForm.BeginInvoke((MethodInvoker)(() => _btn.Visible = shouldShow));
 
             return true;
         }
