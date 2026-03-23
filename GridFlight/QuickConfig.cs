@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MissionPlanner.Utilities;
 using Settings = MissionPlanner.Utilities.Settings;
 using System.Collections;
+using IronPython.Compiler.Ast;
 
 namespace MissionPlanner.GridFlight
 {
@@ -45,12 +46,17 @@ namespace MissionPlanner.GridFlight
             paramsShown = newParams;
         }
 
-        public static void SaveQuickConfig(QuickConfig qc)
-        { 
+        public static bool SaveQuickConfig(QuickConfig qc)
+        {
             string key = "quickconfig_" + System.Net.WebUtility.UrlEncode(qc.getName()).Replace("+", "_");
+            if (Settings.Instance[key + "_name"] != null)
+            {
+                return false;
+            }
             Settings.Instance[key + "_name"] = qc.getName();
             Settings.Instance.SetList(key + "_params", qc.getParams());
             Settings.Instance.AppendList("quickconfig_names", qc.getName());
+            return true;
         }
 
         public static QuickConfig LoadQuickConfig(string name)

@@ -36,9 +36,9 @@ namespace GridFlight
         public override string Version => "1.0";
         public override string Author  => "GridFlight";
 
-        private static ArrayList defaultConfigs = new ArrayList();
+        // -- Configuraciones predefinidas
 
-        private static ArrayList userConfigs = new ArrayList();
+        private static ArrayList defaultConfigs = new ArrayList();
 
         private static List<string> VTOL = new List<string>
         {
@@ -149,7 +149,7 @@ namespace GridFlight
 
         // -- Agregar una configuración -----------------------------------
 
-        private void SaveCustomConfig()
+        private bool SaveCustomConfig(string name)
         {
             List<string> newParams = new List<string>();
             string colms = Settings.Instance["quickViewColms"];
@@ -167,8 +167,15 @@ namespace GridFlight
                 }
             }
 
-            QuickConfig newConfig = new QuickConfig("Config_Prueba", newParams);
-            QuickConfig.SaveQuickConfig(newConfig);
+            QuickConfig newConfig = new QuickConfig(name, newParams);
+            if (QuickConfig.SaveQuickConfig(newConfig))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         // ── Diálogo gestor de configuraciones ───────────────────────────
@@ -225,7 +232,7 @@ namespace GridFlight
                 form.Close();
             };
 
-            // -- Configuración DRON
+            // -- Configuración DRON --
 
             var btnDRON = new PictureBox
             {
@@ -251,6 +258,7 @@ namespace GridFlight
                 Location = new Point(btnDRON.Location.X + btnDRON.Width/4, btnDRON.Location.Y + btnDRON.Height + 5),
             };
 
+            //Lista de configuraciones
             var listConfig = new ListBox
             {
                 Location = new Point(25, 270),
@@ -258,7 +266,7 @@ namespace GridFlight
                 DataSource = QuickConfig.AllQuickConfigs(),
                 HorizontalScrollbar = true
             };
-
+            // -- Botón de guardado --
             var saveBtn = new Button
             {
                 Text = "Guardar config",
@@ -270,10 +278,10 @@ namespace GridFlight
             saveBtn.Click += (s, e) =>
             {
                 AskForName();
-                //SaveCustomConfig();
-                
+                form.Close();
             };
 
+            // -- Botón de Carga --
             var loadBtn = new Button
             {
                 Text = "Cargar config",
@@ -284,10 +292,14 @@ namespace GridFlight
 
             loadBtn.Click += (s, e) =>
             {
-                ApplyQuickTabPreset((QuickConfig.LoadQuickConfig(listConfig.GetItemText(listConfig.SelectedItem)).getParams()));
-                form.Close();
+                if (listConfig.SelectedItem is QuickConfig selected)
+                {
+                    ApplyQuickTabPreset(selected.getParams());
+                    form.Close();
+                }
             };
 
+            // -- Botón de Borrado --
             var eraseBtn = new Button
             {
                 Text = "Borrar config",
@@ -300,7 +312,7 @@ namespace GridFlight
             {
                 if (listConfig.SelectedItem is QuickConfig selected)
                 {
-                    QuickConfig.EraseQuickConfig(selected.getName());
+                    ConfigErase(selected.getName());
                     form.Close();
                 }
             };
@@ -318,6 +330,7 @@ namespace GridFlight
             form.ShowDialog();
         }
         
+        // -- Introducir nombre al guardar config --
         private void AskForName()
         {
             var form = new Form
@@ -332,18 +345,135 @@ namespace GridFlight
 
             var lblText = new Label
             {
-                Text = "Introduce un Nombre",
+                Text = "Introduce el nombre de la configuración",
                 Font = new Font("Segoe UI", 11f, FontStyle.Bold),
-                Location = new Point(75, 25),
+                Location = new Point(10, 35),
                 AutoSize = true
             };
 
             var textBox = new TextBox
             {
-                BackColor = Color.White
+                Location = new Point(75,110),
+                Size = new Size(150,20),
+                AutoSize = true
+            };
+
+            var btnAccept = new Button
+            {
+                Text = "Aceptar",
+                Location = new Point(95,160),
+                Size = new Size(90, 25),
+                FlatStyle = FlatStyle.Flat
+            };
+
+            btnAccept.Click += (s, e) =>
+            {
+                if(SaveCustomConfig(textBox.Text)){
+                    form.Close();
+                }
+
+                else
+                {
+                    ConfigExist();
+                }
+
+            };
+
+            var btnCancel = new Button
+            {
+                Text = "Cancel",
+                Location = new Point(195,160),
+                Size = new Size(90, 25),
+                FlatStyle = FlatStyle.Flat
+            };
+
+            btnCancel.Click += (s, e) =>
+            {
+                form.Close();
             };
 
             form.Controls.Add(lblText);
+            form.Controls.Add(textBox);
+            form.Controls.Add(btnAccept);
+            form.Controls.Add(btnCancel);
+            ThemeManager.ApplyThemeTo(form);
+            form.ShowDialog();
+        }
+
+        // -- Pestaña de error si ya existe --
+        private void ConfigExist()
+        {
+            var form = new Form
+            {
+                ClientSize = new Size(100, 80),
+                FormBorderStyle = FormBorderStyle.FixedSingle,
+                StartPosition = FormStartPosition.CenterParent,
+                MinimizeBox = false,
+                MaximizeBox = false
+            };
+
+            var errorText = new Label
+            {
+                Text = "Ese nombre ya existe",
+                Location = new Point(20,40)
+            };
+
+            form.Controls.Add(errorText);
+            ThemeManager.ApplyThemeTo(form);
+            form.ShowDialog();
+        }
+
+        // -- Pestaña de confirmación de borrado --
+        private void ConfigErase(string name)
+        {
+            var form = new Form
+            {
+                ClientSize = new Size(200, 80),
+                FormBorderStyle = FormBorderStyle.FixedSingle,
+                StartPosition = FormStartPosition.CenterParent,
+                MinimizeBox = false,
+                MaximizeBox = false
+            };
+
+            var questionLbl = new Label
+            {
+                Text = "¿Seguro que quieres borrarlo?",
+                Location = new Point(25,30),
+                AutoSize = true
+            };
+
+
+            var btnYes = new Button
+            {
+                Text = "Si",
+                Location = new Point(20, 60),
+                Size = new Size(30, 20),
+                FlatStyle = FlatStyle.Flat
+            };
+
+            btnYes.Click += (s, e) =>
+            {
+                QuickConfig.EraseQuickConfig(name);
+                form.Close();
+            };
+
+            var btnNo = new Button
+            {
+                Text = "No",
+                Location = new Point(50, 60),
+                Size = new Size(30, 20),
+                FlatStyle = FlatStyle.Flat
+            };
+
+
+            btnNo.Click += (s, e) =>
+            {
+                form.Close();
+            };
+
+            form.Controls.Add(questionLbl);
+            form.Controls.Add(btnYes);
+            form.Controls.Add(btnNo);
             ThemeManager.ApplyThemeTo(form);
             form.ShowDialog();
         }
