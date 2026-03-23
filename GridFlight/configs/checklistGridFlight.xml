@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfCheckListItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- ══ Checks automáticos (telemetría en tiempo real) ══ -->
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>Bateria - Voltaje</Description>
+    <Text>{value} V</Text>
+    <TriggerValue>22</TriggerValue>
+    <Name>battery_voltage</Name>
+    <ConditionType>GT</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>Bateria - Restante</Description>
+    <Text>{value}%</Text>
+    <TriggerValue>20</TriggerValue>
+    <Name>battery_remaining</Name>
+    <ConditionType>GT</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>GPS - Fix 3D</Description>
+    <Text>Fix: {value}</Text>
+    <TriggerValue>3</TriggerValue>
+    <Name>gpsstatus</Name>
+    <ConditionType>GTEQ</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>GPS - Satelites</Description>
+    <Text>{value} sats</Text>
+    <TriggerValue>8</TriggerValue>
+    <Name>satcount</Name>
+    <ConditionType>GTEQ</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>GPS - Precision HDOP</Description>
+    <Text>HDOP: {value}</Text>
+    <TriggerValue>2</TriggerValue>
+    <Name>gpshdop</Name>
+    <ConditionType>LT</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>PreArm Status OK</Description>
+    <Text>{value}</Text>
+    <TriggerValue>1</TriggerValue>
+    <Name>prearmstatus</Name>
+    <ConditionType>EQ</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>Sin Failsafe activo</Description>
+    <Text>{value}</Text>
+    <TriggerValue>0</TriggerValue>
+    <Name>failsafe</Name>
+    <ConditionType>EQ</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>Green</TrueColor>
+    <FalseColor>Red</FalseColor>
+    <Description>Calidad de enlace</Description>
+    <Text>{value}%</Text>
+    <TriggerValue>50</TriggerValue>
+    <Name>linkqualitygcs</Name>
+    <ConditionType>GT</ConditionType>
+  </CheckListItem>
+  <!-- ══ Checks manuales (checkbox, el operador verifica) ══ -->
+  <CheckListItem>
+    <TrueColor>White</TrueColor>
+    <FalseColor>White</FalseColor>
+    <Description>Helices aseguradas y sin dano</Description>
+    <Text />
+    <TriggerValue>0</TriggerValue>
+    <Name>roll</Name>
+    <ConditionType>NONE</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>White</TrueColor>
+    <FalseColor>White</FalseColor>
+    <Description>Bateria bien conectada y asegurada</Description>
+    <Text />
+    <TriggerValue>0</TriggerValue>
+    <Name>roll</Name>
+    <ConditionType>NONE</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>White</TrueColor>
+    <FalseColor>White</FalseColor>
+    <Description>Camera/payload asegurado</Description>
+    <Text />
+    <TriggerValue>0</TriggerValue>
+    <Name>roll</Name>
+    <ConditionType>NONE</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>White</TrueColor>
+    <FalseColor>White</FalseColor>
+    <Description>Area de vuelo despejada de personas</Description>
+    <Text />
+    <TriggerValue>0</TriggerValue>
+    <Name>roll</Name>
+    <ConditionType>NONE</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>White</TrueColor>
+    <FalseColor>White</FalseColor>
+    <Description>Condiciones meteorologicas aceptables</Description>
+    <Text />
+    <TriggerValue>0</TriggerValue>
+    <Name>roll</Name>
+    <ConditionType>NONE</ConditionType>
+  </CheckListItem>
+  <CheckListItem>
+    <TrueColor>White</TrueColor>
+    <FalseColor>White</FalseColor>
+    <Description>Zona de despegue/aterrizaje despejada</Description>
+    <Text />
+    <TriggerValue>0</TriggerValue>
+    <Name>roll</Name>
+    <ConditionType>NONE</ConditionType>
+  </CheckListItem>
+</ArrayOfCheckListItem>

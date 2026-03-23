@@ -36,8 +36,8 @@ namespace GridFlight
         public override string Version => "1.0";
         public override string Author  => "GridFlight";
 
-        public override bool Init() => true;
-        // -- Configuraciones predefinidas
+        
+        // -- Configuraciones predefinidas --
 
         private static ArrayList defaultConfigs = new ArrayList();
 
@@ -83,7 +83,9 @@ namespace GridFlight
             "wind_vel",
             "wind_dir"
         };
-
+        
+        public override bool Init() => true;
+        
         public override bool Loaded()
         {
             defaultConfigs.Add(VTOL);
