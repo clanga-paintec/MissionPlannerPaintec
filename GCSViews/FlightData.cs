@@ -6673,5 +6673,10 @@ namespace MissionPlanner.GCSViews
             // Pass `this` to keep the pop-out always on top
             form.Show(this);
         }
+        //Código GridFlight
+        internal void Startup()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
