@@ -15,7 +15,7 @@ Gestor de configuraciones favoritas de parametros del dron. Permite guardar, car
 
 | Operacion | Descripcion |
 |-----------|-------------|
-| **Guardar** | Lee `MainV2.comPort.MAV.param` > pide nombre > `ParamFile.SaveParamFile()` |
-| **Cargar** | `ParamFile.loadParamFile()` > `ParamCompare()` para comparar y aplicar selectivamente via MAVLink |
-| **Eliminar** | Borra archivo `.param` con confirmacion |
-| **Importar** | Copia `.param` externo al directorio de configuraciones |
+| **Guardar** | Lee `Settings.Instance` > pide nombre > `QuickConfig.SaveQuickConfig` |
+| **Editar** | Lee `Settings.Instance` lo guarda en un QuickConfig temporal y lo guarda otra vez |
+| **Cargar** | `QuickConfig.LoadSQuickConfig` > `Settings.Instance` para comparar y aplicar selectivamente |
+| **Eliminar** | Borra lista con confirmacion |

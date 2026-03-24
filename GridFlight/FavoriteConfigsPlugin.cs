@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using BruTile.Wmts.Generated;
@@ -32,56 +34,80 @@ namespace GridFlight
     /// </summary>
     public class FavoriteConfigsPlugin : MissionPlanner.Plugin.Plugin
     {
-        public override string Name    => "GridFlight - Favorite Configurations";
+        public override string Name => "GridFlight - Favorite Configurations";
         public override string Version => "1.0";
-        public override string Author  => "GridFlight";
+        public override string Author => "GridFlight";
 
         // -- Configuraciones predefinidas
 
         private static ArrayList defaultConfigs = new ArrayList();
 
-        private static List<string> VTOL = new List<string>
-        {
-            "3",
-            "5",
-            "airspeed",
-            "groundspeed",
-            "alt",
-            "DistToHome",
-            "battery_voltage",
-            "battery_usedmah",
-            "verticalspeed",
-            "distTraveled",
-            "current",
-            "altasl",
-            "ter_alt",
-            "timeInAirMinSec",
-            "wind_vel",
-            "gimballng",
-            "gimballat",
-            "tot",
-            "toh"
+        private static QuickConfig VTOL = new QuickConfig
+        (
+            name: "VTOL",
+            paramsShown: new List<string> {
+                "3",
+                "5",
+                "airspeed",
+                "groundspeed",
+                "alt",
+                "DistToHome",
+                "battery_voltage",
+                "battery_usedmah",
+                "verticalspeed",
+                "distTraveled",
+                "current",
+                "altasl",
+                "ter_alt",
+                "timeInAirMinSec",
+                "wind_vel",
+                "gimballng",
+                "gimballat",
+                "tot",
+                "toh"
+            },
+            displayView: new List<string>
+            {
+                "displayQuickTab",
+                "displayPreFlightTab",
+                "displayAdvActionsTab",
+                "displayStatusTab",
+                "displayDataflashTab",
+                "displayMessagesTab"
+            }
+        );
 
-        };
 
-        private static List<string> DRON = new List<string>
-        {
-            "3",
-            "5",
-            "ter_curalt",
-            "alt",
-            "DistToHome",
-            "battery_voltage",
-            "current",
-            "verticalspeed",
-            "distTraveled",
-            "battery_usedmah",
-            "altasl",
-            "ter_alt",
-            "timeInAirMinSec",
-            "wind_vel",
-            "wind_dir"
-        };
+        private static QuickConfig DRON = new QuickConfig
+        (
+            name: "DRON",
+            paramsShown: new List<string> {
+                "3",
+                "5",
+                "ter_curalt",
+                "alt",
+                "DistToHome",
+                "battery_voltage",
+                "current",
+                "verticalspeed",
+                "distTraveled",
+                "battery_usedmah",
+                "altasl",
+                "ter_alt",
+                "timeInAirMinSec",
+                "wind_vel",
+                "wind_dir"
+            },
+            displayView: new List<string>
+            {
+                "displayQuickTab",
+                "displayPreFlightTab",
+                "displayAdvActionsTab",
+                "displayStatusTab",
+                "displayDataflashTab",
+                "displayMessagesTab"
+            }
+        );
         public override bool Init() => true;
 
         public override bool Loaded()
@@ -96,21 +122,77 @@ namespace GridFlight
 
         // -- Cambiar Quick Tab menu --------------------------------------
 
-        private void ApplyQuickTabPreset(List<string> fields)
+        // Mapeo de nombres de propiedad DisplayView → nombre del TabPage en FlightData
+        private static readonly Dictionary<string, string> PropToTabName = new Dictionary<string, string>
         {
-            Settings.Instance["quickViewColms"] = fields.ElementAt(0);
-            Settings.Instance["quickViewRows"] = fields.ElementAt(1);
+            { "displayQuickTab",         "tabQuick" },
+            { "displayPreFlightTab",     "tabPagePreFlight" },
+            { "displayAdvActionsTab",    "tabActions" },
+            { "displaySimpleActionsTab", "tabActionsSimple" },
+            { "displayGaugesTab",        "tabGauges" },
+            { "displayStatusTab",        "tabStatus" },
+            { "displayServoTab",         "tabServo" },
+            { "displayScriptsTab",       "tabScripts" },
+            { "displayTelemetryTab",     "tabTLogs" },
+            { "displayDataflashTab",     "tablogbrowse" },
+            { "displayMessagesTab",      "tabPagemessages" },
+            { "displayTransponderTab",   "tabTransponder" },
+            { "displayAuxFunctionTab",   "tabAuxFunction" },
+            { "displayPayloadTab",       "tabPayload" }
+        };
 
-            for(int i = 2; i < fields.Count; i++)
-            {
+        private void ApplyQuickTabPreset(QuickConfig qc)
+        {
+            // --- Parámetros del Quick Tab (se pueden escribir desde cualquier hilo) ---
+            List<string> fields = qc.getParams();
+            Settings.Instance["quickViewCols"] = fields.ElementAt(0);
+            Settings.Instance["quickViewRows"] = fields.ElementAt(1);
+            for (int i = 2; i < fields.Count; i++)
                 Settings.Instance["quickView" + (i - 2)] = fields.ElementAt(i);
-            }
 
             var fd = MainV2.instance?.FlightData;
             if (fd == null) return;
 
+            List<string> displayList = qc.getDisplayView();
+
             fd.Invoke((Action)(() =>
             {
+                if (displayList != null && displayList.Count > 0)
+                {
+                    // Nombres de tabs que el preset quiere mostrar.
+                    // Soporta dos formatos:
+                    //   - Nombre de propiedad: "displayQuickTab" → mapea a "tabQuick" via PropToTabName
+                    //   - Nombre de tab directo: "tabQuick"       → se usa tal cual
+                    var tabNamesToShow = new HashSet<string>(
+                        displayList.Select(p => PropToTabName.ContainsKey(p) ? PropToTabName[p] : p)
+                    );
+
+                    // Obtener el TabControl directamente (evita depender de updateDisplayView)
+                    var found = fd.Controls.Find("tabControlactions", true);
+                    if (found.Length > 0 && found[0] is TabControl tabControl)
+                    {
+                        tabControl.TabPages.Clear();
+                        string savedOrder = "";
+                        foreach (TabPage tabPage in fd.TabListOriginal)
+                        {
+                            if (tabNamesToShow.Contains(tabPage.Name))
+                            {
+                                tabControl.TabPages.Add(tabPage);
+                                savedOrder += tabPage.Name + ";";
+                            }
+                        }
+                        Settings.Instance["tabcontrolactions"] = savedOrder;
+
+                        // Poner todas las entradas de TabListDisplay a true
+                        // para que el menú Customize muestre todas las pestañas
+                        foreach (var key in fd.TabListDisplay.Keys.ToList())
+                            fd.TabListDisplay[key] = true;
+                        foreach (TabPage tabPage in fd.TabListOriginal)
+                            if (!fd.TabListDisplay.ContainsKey(tabPage.Name))
+                                fd.TabListDisplay[tabPage.Name] = true;
+                    }
+                }
+
                 fd.Activate();
             }));
         }
@@ -156,13 +238,15 @@ namespace GridFlight
         private bool SaveCustomConfig(string name)
         {
             List<string> newParams = new List<string>();
-            string colms = Settings.Instance["quickViewColms"];
+            List<string> tabs = Settings.Instance["tabcontrolactions"].Split(';').ToList();
+
+            string cols = Settings.Instance["quickViewCols"];
             string rows = Settings.Instance["quickViewRows"];
-            newParams.Add(colms);
+            newParams.Add(cols);
             newParams.Add(rows);
             int qvCounter = 0;
 
-            for(int i = 2; i < Settings.Instance.Count; i++)
+            for(int i = 2; i < (int.Parse(cols) * int.Parse(rows)); i++)
             {
                 if (Settings.Instance["quickView" +  i] != null)
                 {
@@ -171,7 +255,9 @@ namespace GridFlight
                 }
             }
 
-            QuickConfig newConfig = new QuickConfig(name, newParams);
+
+
+            QuickConfig newConfig = new QuickConfig(name, newParams,tabs);
             if (QuickConfig.SaveQuickConfig(newConfig))
             {
                 return true;
@@ -189,6 +275,7 @@ namespace GridFlight
             int formSizeX = 500;
             int formSizeY = 430;
             Size btnSize = new Size(90, 25);
+            Size dftSize = new Size(80, 80);
 
             var form = new Form
             {
@@ -218,7 +305,7 @@ namespace GridFlight
                         new Bitmap(Path.Combine(Settings.GetRunningDirectory(), "Resources", "01_01.png")),
                 Anchor = AnchorStyles.Top,
                 Location = new Point((formSizeX/defaultConfigs.Count)/2 - 25 , formSizeY/4),
-                Size = new Size(80,80),
+                Size = dftSize,
                 SizeMode = PictureBoxSizeMode.Zoom
 
             };
@@ -245,7 +332,7 @@ namespace GridFlight
                         new Bitmap(Path.Combine(Settings.GetRunningDirectory(), "Resources", "01_05.png")),
                 Anchor = AnchorStyles.Top,
                 Location = new Point(formSizeX / defaultConfigs.Count + (formSizeX / defaultConfigs.Count) / 2 - 25, formSizeY / 4),
-                Size = new Size(80, 80),
+                Size = dftSize,
                 SizeMode = PictureBoxSizeMode.Zoom
             };
 
@@ -262,7 +349,7 @@ namespace GridFlight
                 Location = new Point(btnDRON.Location.X + btnDRON.Width/4, btnDRON.Location.Y + btnDRON.Height + 5),
             };
 
-            //Lista de configuraciones
+            // -- Lista de configuraciones --
             var listConfig = new ListBox
             {
                 Location = new Point(25, 270),
@@ -274,7 +361,7 @@ namespace GridFlight
             var saveBtn = new Button
             {
                 Text = "Guardar config",
-                Location = new Point(185,380),
+                Location = new Point(90,380),
                 Size = btnSize,
                 FlatStyle = FlatStyle.Flat
             };
@@ -283,6 +370,25 @@ namespace GridFlight
             {
                 AskForName();
                 form.Close();
+            };
+
+            var editBtn = new Button
+            {
+                Text = "Editar config",
+                Size = btnSize,
+                Location = new Point(185, 380),
+                FlatStyle = FlatStyle.Flat
+            };
+
+            editBtn.Click += (s, e) =>
+            {
+                if (listConfig.SelectedItem is QuickConfig selected)
+                {
+                    QuickConfig qc = selected;
+                    QuickConfig.EraseQuickConfig(selected.getName());
+                    QuickConfig.SaveQuickConfig(qc);
+                }
+                form.Refresh();
             };
 
             // -- Botón de Carga --
@@ -298,7 +404,7 @@ namespace GridFlight
             {
                 if (listConfig.SelectedItem is QuickConfig selected)
                 {
-                    ApplyQuickTabPreset(selected.getParams());
+                    ApplyQuickTabPreset(selected);
                     form.Close();
                 }
             };
@@ -316,8 +422,10 @@ namespace GridFlight
             {
                 if (listConfig.SelectedItem is QuickConfig selected)
                 {
-                    ConfigErase(selected.getName());
-                    form.Close();
+                    if (ConfigErase(selected.getName()))
+                    {
+                        form.Close();
+                    }
                 }
             };
 
@@ -328,6 +436,7 @@ namespace GridFlight
             form.Controls.Add(nameDRON);
             form.Controls.Add(listConfig);
             form.Controls.Add(saveBtn);
+            form.Controls.Add(editBtn);
             form.Controls.Add(loadBtn);
             form.Controls.Add(eraseBtn);
             ThemeManager.ApplyThemeTo(form);
@@ -428,8 +537,9 @@ namespace GridFlight
         }
 
         // -- Pestaña de confirmación de borrado --
-        private void ConfigErase(string name)
+        private bool ConfigErase(string name)
         {
+            bool changeValue = false;
             var form = new Form
             {
                 ClientSize = new Size(200, 80),
@@ -458,6 +568,7 @@ namespace GridFlight
             btnYes.Click += (s, e) =>
             {
                 QuickConfig.EraseQuickConfig(name);
+                changeValue = true;
                 form.Close();
             };
 
@@ -480,6 +591,7 @@ namespace GridFlight
             form.Controls.Add(btnNo);
             ThemeManager.ApplyThemeTo(form);
             form.ShowDialog();
+            return changeValue;
         }
         // ── Icono estrella renderizado con SkiaSharp ────────────────────
 
