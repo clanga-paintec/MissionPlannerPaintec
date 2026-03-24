@@ -65,51 +65,13 @@ namespace GridFlight
             // --- 1. Reordenar grid (upstream -> GridFlight layout) ---
             RearrangeGrid(panel);
 
-            // --- 2. Lista completa: solo para mecánicos ---
-            if (GridFlightProfile.IsMechanic)
-            {
-                CreateFullListControls(panel);
-            }
-
-            // --- 3. Filtro de modos en CMB_modes (todos los perfiles) ---
+            // --- 2. Filtro de modos en CMB_modes (todos los perfiles) ---
             cmbModes.Click += CmbModes_FilterClick;
 
             return false;
         }
 
         public override bool Exit() => true;
-
-        private void CreateFullListControls(TableLayoutPanel panel)
-        {
-            _cmbFullList = new ComboBox
-            {
-                Name              = "CMB_modes_full_list",
-                DropDownStyle     = ComboBoxStyle.DropDownList,
-                DropDownWidth     = 150,
-                FormattingEnabled = true,
-                Dock              = DockStyle.Fill,
-            };
-            _cmbFullList.Click += CmbFullList_Click;
-
-            var btnFullList = new MyButton
-            {
-                Name                    = "BUT_setmode_full_list",
-                Text                    = "Set Mode",
-                Dock                    = DockStyle.Fill,
-                ColorMouseDown          = Color.Empty,
-                ColorMouseOver          = Color.Empty,
-                ColorNotEnabled         = Color.Empty,
-                TextColorNotEnabled     = Color.FromArgb(64, 87, 4),
-                UseVisualStyleBackColor = true,
-            };
-            btnFullList.Click += BtnFullList_Click;
-
-            panel.Controls.Add(_cmbFullList, 0, 4);
-            panel.Controls.Add(btnFullList, 1, 4);
-
-            ThemeManager.ApplyThemeTo(_cmbFullList);
-            ThemeManager.ApplyThemeTo(btnFullList);
-        }
 
         /// <summary>
         /// Reordena los controles del tableLayoutPanel1 desde las posiciones
@@ -164,34 +126,14 @@ namespace GridFlight
             var cmb = (ComboBox)sender;
             string current = cmb.Text;
 
-            cmb.DataSource = ArduPilotCommon.getModesList(MainV2.comPort.MAV.cs.firmware)
+            cmb.DataSource = GridFlightProfile.IsPilot ?
+                ArduPilotCommon.getModesList(MainV2.comPort.MAV.cs.firmware)
                 .Where(kvp => !HiddenModes.Contains(kvp.Value, StringComparer.OrdinalIgnoreCase))
-                .ToList();
+                .ToList() :
+                ArduPilotCommon.getModesList(MainV2.comPort.MAV.cs.firmware);
             cmb.ValueMember   = "Key";
             cmb.DisplayMember = "Value";
             cmb.Text          = current;
-        }
-
-        private void CmbFullList_Click(object sender, EventArgs e)
-        {
-            string current = _cmbFullList.Text;
-
-            _cmbFullList.DataSource    = ArduPilotCommon.getModesList(MainV2.comPort.MAV.cs.firmware);
-            _cmbFullList.ValueMember   = "Key";
-            _cmbFullList.DisplayMember = "Value";
-            _cmbFullList.Text          = current;
-        }
-
-        private void BtnFullList_Click(object sender, EventArgs e)
-        {
-            if (MainV2.comPort.MAV.cs.failsafe)
-            {
-                if (CustomMessageBox.Show("You are in failsafe, are you sure?",
-                    "Failsafe", MessageBoxButtons.YesNo) != (int)DialogResult.Yes)
-                    return;
-            }
-
-            MainV2.comPort.setMode(_cmbFullList.Text);
         }
     }
 }

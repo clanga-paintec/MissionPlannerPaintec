@@ -9,6 +9,7 @@ using MissionPlanner.Utilities;
 using Settings = MissionPlanner.Utilities.Settings;
 using System.Collections;
 using IronPython.Compiler.Ast;
+using fastJSON;
 
 namespace MissionPlanner.GridFlight
 {
@@ -16,11 +17,13 @@ namespace MissionPlanner.GridFlight
     {
         private List<string> paramsShown;
         private string name;
+        private List<string> displayView;
         
-        public QuickConfig(string name, List<string> paramsShown)
+        public QuickConfig(string name, List<string> paramsShown, List<string> displayView)
         {
             this.name = name;
             this.paramsShown = paramsShown;
+            this.displayView = displayView;
         }
 
         public string getName()
@@ -46,15 +49,26 @@ namespace MissionPlanner.GridFlight
             paramsShown = newParams;
         }
 
+        public List<string> getDisplayView()
+        {
+            return displayView;
+        }
+
+        public void setDisplayView(List<string> displayView)
+        {
+            this.displayView = displayView;
+        }
         public static bool SaveQuickConfig(QuickConfig qc)
         {
             string key = "quickconfig_" + System.Net.WebUtility.UrlEncode(qc.getName()).Replace("+", "_");
+            List<string> tabs = qc.getDisplayView();
             if (Settings.Instance[key + "_name"] != null)
             {
                 return false;
             }
             Settings.Instance[key + "_name"] = qc.getName();
             Settings.Instance.SetList(key + "_params", qc.getParams());
+            Settings.Instance.SetList(key + "_tabs", tabs);
             Settings.Instance.AppendList("quickconfig_names", qc.getName());
             return true;
         }
@@ -63,7 +77,8 @@ namespace MissionPlanner.GridFlight
         {
             string key = "quickconfig_" + System.Net.WebUtility.UrlEncode(name).Replace("+", "_");
             List<string> parms = Settings.Instance.GetList(key + "_params").ToList();
-            return new QuickConfig(name, parms);
+            List<string> tabs = Settings.Instance.GetList(key + "_tabs").ToList();
+            return new QuickConfig(name, parms, tabs);
         }
 
         public static List<QuickConfig> AllQuickConfigs()
@@ -79,7 +94,5 @@ namespace MissionPlanner.GridFlight
             Settings.Instance.Remove(key + "_params");
             Settings.Instance.RemoveList("quickconfig_names", name);
         }
-
-
     }
 }
