@@ -133,8 +133,7 @@ namespace GridFlight
             btnMechanic.Click += (s, e) =>
             {
                 // Pedir contraseña antes de permitir acceso a Mecánico
-                if (!RequestMechanicPassword())
-                    return;
+                PromptRestart();
 
                 GridFlightProfile.Set(GridFlightProfile.Mechanic);
                 form.Close();

@@ -95,8 +95,11 @@ namespace GridFlight
 
             var btn = new ToolStripButton
             {
-                DisplayStyle = ToolStripItemDisplayStyle.Image,
+                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
                 ToolTipText  = "Registro de Mantenimiento",
+                Text = "MAINTENANCE",
+                TextImageRelation = TextImageRelation.ImageAboveText,
+                Font = new Font("Segoe UI", 8f),
                 Margin       = new Padding(4, 1, 0, 2),
                 Image        = RenderWrenchIcon(24)
             };
